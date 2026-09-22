@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Relatórios</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .reports-hero {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 1rem;
+      padding: 1.5rem 1.5rem 0;
+    }
+    .report-kpi {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .report-kpi::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+    }
+    .report-kpi:nth-child(1)::before { background: linear-gradient(90deg,#6366f1,#8b5cf6); }
+    .report-kpi:nth-child(2)::before { background: linear-gradient(90deg,#22c55e,#06b6d4); }
+    .report-kpi:nth-child(3)::before { background: linear-gradient(90deg,#f59e0b,#ef4444); }
+    .report-kpi:nth-child(4)::before { background: linear-gradient(90deg,#06b6d4,#6366f1); }
+    .report-kpi-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text3); margin-bottom:4px; }
+    .report-kpi-value { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; line-height:1; margin-bottom:4px; }
+    .report-kpi-sub   { font-size:0.72rem; color:var(--text3); }
+
+    .reports-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .reports-toolbar select, .reports-toolbar input[type=date] {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-sm);
+      color: var(--text2);
+      padding: 0.45rem 0.75rem;
+      font-size: 0.8rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .reports-toolbar select:hover, .reports-toolbar input[type=date]:hover {
+      border-color: var(--accent2);
+    }
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--panel-border);
+      background: var(--bg3);
+      color: var(--text2);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-left: auto;
+    }
+    .export-btn:hover { background: var(--accent3); color: var(--accent2); border-color: rgba(99,102,241,0.3); }
+
+    .reports-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      padding: 1rem 1.5rem 0;
+    }
+    .reports-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 1rem;
+      padding: 1rem 1.5rem 0;
+    }
+    .report-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem 1.25rem;
+    }
+    .report-card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ranking-table { width:100%; border-collapse:collapse; }
+    .ranking-table th { font-size:0.68rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text3); padding:4px 6px 8px; text-align:left; border-bottom:1px solid var(--panel-border); }
+    .ranking-table td { padding:7px 6px; font-size:0.8rem; border-bottom:1px solid rgba(255,255,255,0.04); color:var(--text2); vertical-align:middle; }
+    .ranking-table tr:last-child td { border-bottom:none; }
+    .ranking-table tr:hover td { background:rgba(255,255,255,0.02); }
+
+    .sla-gauge-wrap { display:flex; flex-direction:column; gap:10px; }
+    .sla-gauge-row { display:flex; align-items:center; gap:10px; }
+    .sla-gauge-label { font-size:0.78rem; width:60px; color:var(--text2); flex-shrink:0; }
+    .sla-gauge-track { flex:1; height:8px; background:var(--bg3); border-radius:10px; overflow:hidden; }
+    .sla-gauge-fill  { height:100%; border-radius:10px; transition:width 0.8s ease; }
+    .sla-gauge-pct   { font-size:0.72rem; font-weight:700; width:34px; text-align:right; flex-shrink:0; }
+
+    .activity-list { display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto; }
+    .activity-item { display:flex; align-items:flex-start; gap:10px; padding:8px 10px; background:var(--bg3); border-radius:var(--radius-sm); border:1px solid var(--panel-border); }
+    .activity-dot  { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+    .activity-text { flex:1; font-size:0.78rem; color:var(--text2); line-height:1.4; }
+    .activity-text strong { color:var(--text1); }
+    .activity-time { font-size:0.68rem; color:var(--text3); flex-shrink:0; margin-top:2px; }
+
+    @media (max-width:1000px) {
+      .reports-hero   { grid-template-columns:repeat(2,1fr); }
+      .reports-grid-2 { grid-template-columns:1fr; }
+      .reports-grid-3 { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:600px) {
+      .reports-hero   { grid-template-columns:1fr 1fr; padding:1rem; }
+      .reports-grid-3 { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body class="app-page">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark sm"><span class="logo-i">i</span><span class="logo-plus">+</span></div>
+    <span class="sidebar-brand">INOVA<span class="accent">+</span></span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">PRINCIPAL</div>
+    <a href="dashboard.html"  class="nav-item"><i class="fa fa-gauge-high"></i><span>Dashboard</span></a>
+    <a href="tickets.html"    class="nav-item"><i class="fa fa-ticket"></i><span>Todos os Tickets</span></a>
+    <a href="new-ticket.html" class="nav-item"><i class="fa fa-plus-circle"></i><span>Abrir Chamado</span></a>
+    <a href="my-tickets.html" class="nav-item"><i class="fa fa-folder-open"></i><span>Meus Chamados</span></a>
+    <div class="nav-section-label">GESTÃO</div>
+    <a href="reports.html"    class="nav-item active"><i class="fa fa-chart-bar"></i><span>Relatórios</span></a>
+    <a href="team.html"       class="nav-item"><i class="fa fa-users"></i><span>Equipe</span></a>
+    <a href="kb.html"         class="nav-item"><i class="fa fa-book"></i><span>Base de Conhecimento</span></a>
+    <a href="alerts.html"     class="nav-item"><i class="fa fa-bell"></i><span>Central de Alertas</span></a>
+    <a href="chat.html" class="nav-item"><i class="fa fa-comments"></i><span>Conversas</span></a>
+    <div class="nav-section-label">SISTEMA</div>
+    <a href="#" class="nav-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i><span>Sair</span></a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-avatar">CG</div>
+    <div class="user-info">
+      <span class="user-name" id="sidebar-name">Cauan Gomes</span>
+      <span class="user-role admin-badge">Admin</span>
+    </div>
+    <div class="online-dot"></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main-content">
+  <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+    <div class="topbar-title">
+      <h1>Relatórios <span class="accent">e Análises</span></h1>
+      <span class="topbar-date" id="topbar-date"></span>
+    </div>
+    <div class="topbar-actions">
+      <div class="notif-btn" onclick="toggleNotif()">
+        <i class="fa fa-bell"></i>
+        <span class="notif-count" id="notif-count-badge" style="display:none">0</span>
+        <div class="notif-panel hidden" id="notif-panel"></div>
+      </div>
+      <div class="user-avatar sm" id="topbar-avatar">CG</div>
+    </div>
+  </header>
+
+  <!-- HERO KPIS -->
+  <section class="reports-hero" id="reports-hero"></section>
+
+  <!-- TOOLBAR -->
+  <div class="reports-toolbar">
+    <span style="font-size:0.8rem;color:var(--text3);font-weight:600"><i class="fa fa-filter" style="margin-right:6px"></i>Filtrar por:</span>
+    <select id="rpt-period" onchange="rebuildCharts()">
+      <option value="all">Todo o período</option>
+      <option value="month" selected>Este mês</option>
+      <option value="week">Esta semana</option>
+    </select>
+    <select id="rpt-category" onchange="rebuildCharts()">
+      <option value="">Todas as categorias</option>
+      <option>Impressora</option><option>Suprimentos</option>
+      <option>TI</option><option>Rede</option><option>Financeiro</option><option>RH</option>
+    </select>
+    <select id="rpt-priority" onchange="rebuildCharts()">
+      <option value="">Todas as prioridades</option>
+      <option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option>
+    </select>
+    <button class="export-btn" onclick="exportCSV()"><i class="fa fa-file-csv"></i> Exportar CSV</button>
+    <button class="export-btn" onclick="window.print()" style="margin-left:0"><i class="fa fa-print"></i> Imprimir</button>
+  </div>
+
+  <!-- ROW 1: volume + categoria -->
+  <div class="reports-grid-2">
+    <div class="report-card">
+      <div class="report-card-title">
+        Abertura de Chamados por Dia
+        <span class="chip">Últimos 7 dias</span>
+      </div>
+      <canvas id="rpt-chart-volume" height="120"></canvas>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">
+        Distribuição por Categoria
+        <span class="chip" id="rpt-total-chip">0 tickets</span>
+      </div>
+      <canvas id="rpt-chart-cat" height="120"></canvas>
+    </div>
+  </div>
+
+  <!-- ROW 2: SLA gauges + prioridade + status -->
+  <div class="reports-grid-3">
+    <div class="report-card">
+      <div class="report-card-title">SLA por Prioridade</div>
+      <div class="sla-gauge-wrap" id="rpt-sla-gauges"></div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">Tickets por Prioridade</div>
+      <canvas id="rpt-chart-priority" height="160"></canvas>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">Status Atual</div>
+      <canvas id="rpt-chart-status" height="160"></canvas>
+    </div>
+  </div>
+
+  <!-- ROW 3: ranking atendentes + atividade recente -->
+  <div class="reports-grid-2" style="padding-bottom:2rem">
+    <div class="report-card">
+      <div class="report-card-title">
+        Ranking de Atendentes
+        <span class="chip">Por resoluções</span>
+      </div>
+      <table class="ranking-table" id="rpt-ranking"></table>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">
+        Atividade Recente
+        <span class="chip">Últimas atualizações</span>
+      </div>
+      <div class="activity-list" id="rpt-activity"></div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+</main>
+
+<div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="toggleSidebar()"></div>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="api.js"></script>
+
+<script>
+  const RPT_COLORS = {
+    'Impressora':'#6366f1','Suprimentos':'#f59e0b','TI':'#22c55e',
+    'Rede':'#06b6d4','Financeiro':'#ec4899','RH':'#8b5cf6','Outro':'#94a3b8',
+    'Crítica':'#ef4444','Alta':'#f59e0b','Média':'#818cf8','Baixa':'#22c55e',
+    'Aberto':'#818cf8','Em andamento':'#f59e0b','Resolvido':'#22c55e','Fechado':'#475569',
+  };
+
+  const gridColor = 'rgba(255,255,255,0.05)';
+  const tickColor = '#64748b';
+  const dfont = { family:'DM Sans', size:11 };
+  Chart.defaults.color = tickColor;
+  Chart.defaults.font  = dfont;
+
+  let charts = {};
+
+  window.onload = () => {
+    checkAuth();
+    buildPage();
+  };
+
+  function getFiltered() {
+    const catF = document.getElementById('rpt-category')?.value || '';
+    const priF = document.getElementById('rpt-priority')?.value || '';
+    return TICKETS.filter(t =>
+      (!catF || t.category === catF) &&
+      (!priF || t.priority === priF)
+    );
+  }
+
+  function buildPage() {
+    buildHero();
+    rebuildCharts();
+    buildRanking();
+    buildActivity();
+  }
+
+  // ── HERO ────────────────────────────────────────────────────────────────────
+  function buildHero() {
+    const total    = TICKETS.length;
+    const resolved = TICKETS.filter(t => t.status === 'Resolvido' || t.status === 'Fechado').length;
+    const open     = TICKETS.filter(t => t.status === 'Aberto' || t.status === 'Em andamento').length;
+    const slaAvg   = Math.round(TICKETS.reduce((s,t) => s + t.sla, 0) / total);
+    const critCount= TICKETS.filter(t => t.priority === 'Crítica').length;
+
+    const items = [
+      { label:'Total de Tickets',     value:total,             sub:'No sistema',             color:'var(--accent2)' },
+      { label:'Resolvidos / Fechados', value:resolved,          sub:`${Math.round(resolved/total*100)}% do total`,      color:'var(--success)' },
+      { label:'Em Aberto',             value:open,              sub:'Aguardando ação',         color:'var(--warning)' },
+      { label:'SLA Médio',             value:slaAvg + '%',      sub:`${critCount} críticos ativos`, color:'var(--info)' },
+    ];
+
+    document.getElementById('reports-hero').innerHTML = items.map(i => `
+      <div class="report-kpi">
+        <div class="report-kpi-label">${i.label}</div>
+        <div class="report-kpi-value" style="color:${i.color}">${i.value}</div>
+        <div class="report-kpi-sub">${i.sub}</div>
+      </div>`).join('');
+  }
+
+  // ── CHARTS ──────────────────────────────────────────────────────────────────
+  function rebuildCharts() {
+    Object.values(charts).forEach(c => c.destroy());
+    charts = {};
+
+    const data = getFiltered();
+    document.getElementById('rpt-total-chip').textContent = data.length + ' tickets';
+
+    // 1. Volume por dia (simulated últimos 7 dias)
+    const days  = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+    const vols  = [8,12,7,15,10,4,3].map((v,i) => Math.max(0, v - Math.floor(Math.random()*2)));
+    const ctxV = document.getElementById('rpt-chart-volume');
+    if (ctxV) charts.vol = new Chart(ctxV, {
+      type:'bar',
+      data:{
+        labels: days,
+        datasets:[
+          { label:'Abertos',  data: vols,                        backgroundColor:'rgba(99,102,241,0.7)', borderRadius:5 },
+          { label:'Fechados', data: vols.map(v => Math.max(0,v-2)), backgroundColor:'rgba(34,197,94,0.6)',  borderRadius:5 },
+        ]
+      },
+      options:{responsive:true,plugins:{legend:{labels:{color:tickColor,boxWidth:10}}},scales:{x:{grid:{display:false},ticks:{color:tickColor}},y:{grid:{color:gridColor},ticks:{color:tickColor}}}}
+    });
+
+    // 2. Distribuição por categoria (doughnut)
+    const cats = {};
+    data.forEach(t => { cats[t.category] = (cats[t.category]||0)+1; });
+    const ctxC = document.getElementById('rpt-chart-cat');
+    if (ctxC) charts.cat = new Chart(ctxC, {
+      type:'doughnut',
+      data:{
+        labels:Object.keys(cats),
+        datasets:[{data:Object.values(cats),backgroundColor:Object.keys(cats).map(k=>RPT_COLORS[k]||'#94a3b8'),borderWidth:0}]
+      },
+      options:{responsive:true,cutout:'60%',plugins:{legend:{position:'right',labels:{color:tickColor,boxWidth:10,font:dfont}}}}
+    });
+
+    // 3. SLA gauges
+    const slaData = {'Crítica':[],Alta:[],Média:[],Baixa:[]};
+    data.forEach(t => { if(slaData[t.priority]) slaData[t.priority].push(t.sla); });
+    const colors = {'Crítica':'#ef4444','Alta':'#f59e0b','Média':'#818cf8','Baixa':'#22c55e'};
+    document.getElementById('rpt-sla-gauges').innerHTML = Object.entries(slaData).map(([p,arr]) => {
+      const avg = arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 100;
+      return `<div class="sla-gauge-row">
+        <span class="sla-gauge-label">${p}</span>
+        <div class="sla-gauge-track"><div class="sla-gauge-fill" style="width:${avg}%;background:${colors[p]}"></div></div>
+        <span class="sla-gauge-pct" style="color:${colors[p]}">${avg}%</span>
+      </div>`;
+    }).join('') + `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--panel-border);font-size:0.72rem;color:var(--text3)">
+      Meta: <span style="color:var(--success);font-weight:700">90%</span>
+    </div>`;
+
+    // 4. Por prioridade (polar area)
+    const pris = {};
+    data.forEach(t => { pris[t.priority] = (pris[t.priority]||0)+1; });
+    const ctxP = document.getElementById('rpt-chart-priority');
+    if (ctxP) charts.pri = new Chart(ctxP, {
+      type:'polarArea',
+      data:{
+        labels:Object.keys(pris),
+        datasets:[{data:Object.values(pris),backgroundColor:Object.keys(pris).map(k=>RPT_COLORS[k]+'cc'||'#94a3b8cc'),borderWidth:0}]
+      },
+      options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:tickColor,boxWidth:10,font:dfont}}},scales:{r:{grid:{color:gridColor},ticks:{display:false}}}}
+    });
+
+    // 5. Por status (doughnut)
+    const statuses = {};
+    data.forEach(t => { statuses[t.status] = (statuses[t.status]||0)+1; });
+    const ctxS = document.getElementById('rpt-chart-status');
+    if (ctxS) charts.sta = new Chart(ctxS, {
+      type:'doughnut',
+      data:{
+        labels:Object.keys(statuses),
+        datasets:[{data:Object.values(statuses),backgroundColor:Object.keys(statuses).map(k=>RPT_COLORS[k]||'#94a3b8'),borderWidth:0}]
+      },
+      options:{responsive:true,cutout:'55%',plugins:{legend:{position:'bottom',labels:{color:tickColor,boxWidth:10,font:dfont}}}}
+    });
+  }
+
+  // ── RANKING ──────────────────────────────────────────────────────────────────
+  function buildRanking() {
+    const stats = {};
+    TICKETS.forEach(t => {
+      const a = t.assignee || 'Sem atribuição';
+      if (!stats[a]) stats[a] = { total:0, resolved:0, slaSum:0 };
+      stats[a].total++;
+      stats[a].slaSum += t.sla;
+      if (t.status === 'Resolvido' || t.status === 'Fechado') stats[a].resolved++;
+    });
+
+    const rows = Object.entries(stats)
+      .map(([name, s]) => ({ name, ...s, slaAvg: Math.round(s.slaSum/s.total) }))
+      .sort((a,b) => b.resolved - a.resolved);
+
+    const medals = ['🥇','🥈','🥉'];
+    document.getElementById('rpt-ranking').innerHTML = `
+      <thead><tr>
+        <th>#</th><th>Atendente</th><th>Total</th><th>Resolvidos</th><th>SLA Médio</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map((r,i) => {
+          const slaColor = r.slaAvg >= 80 ? '#22c55e' : r.slaAvg >= 50 ? '#f59e0b' : '#ef4444';
+          return `<tr>
+            <td>${medals[i] || (i+1)+'º'}</td>
+            <td style="font-weight:600;color:var(--text1)">${r.name}</td>
+            <td>${r.total}</td>
+            <td><span style="color:var(--success);font-weight:700">${r.resolved}</span></td>
+            <td><span style="color:${slaColor};font-weight:700">${r.slaAvg}%</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>`;
+  }
+
+  // ── ACTIVITY ─────────────────────────────────────────────────────────────────
+  function buildActivity() {
+    const events = [];
+
+    TICKETS.slice(0, 8).forEach(t => {
+      const statusColors = {'Aberto':'#818cf8','Em andamento':'#f59e0b','Resolvido':'#22c55e','Fechado':'#475569'};
+      events.push({
+        color: statusColors[t.status] || '#94a3b8',
+        html:  `<strong>${t.id}</strong> — ${t.subject.substring(0,40)}${t.subject.length>40?'...':''}`,
+        sub:   `${t.status} · ${t.category} · ${t.assignee || '—'}`,
+        time:  t.created,
+      });
+
+      if (t.comments?.length) {
+        t.comments.forEach(c => {
+          events.push({
+            color: '#6366f1',
+            html:  `<strong>${c.author}</strong> comentou em ${t.id}`,
+            sub:   c.text.substring(0,50)+'...',
+            time:  c.time,
+          });
+        });
+      }
+    });
+
+    document.getElementById('rpt-activity').innerHTML = events.slice(0,10).map(e => `
+      <div class="activity-item">
+        <div class="activity-dot" style="background:${e.color}"></div>
+        <div class="activity-text">
+          ${e.html}
+          <div style="font-size:0.68rem;color:var(--text3);margin-top:2px">${e.sub}</div>
+        </div>
+        <div class="activity-time">${e.time}</div>
+      </div>`).join('');
+  }
+
+  // ── EXPORT CSV ───────────────────────────────────────────────────────────────
+  function exportCSV() {
+    const data = getFiltered();
+    const headers = ['ID','Assunto','Categoria','Solicitante','Atribuído','Prioridade','Status','SLA','Criado em','Serial','Modelo','Dept'];
+    const rows = data.map(t => [
+      t.id, `"${t.subject}"`, t.category, t.requester, t.assignee,
+      t.priority, t.status, t.sla+'%', t.created,
+      t.serial||'', t.model||'', t.dept,
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = `inova-relatorio-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Relatório exportado com sucesso!', 'success');
+  }
+</script>
+</body>
+</html>

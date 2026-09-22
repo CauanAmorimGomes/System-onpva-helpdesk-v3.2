@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Abrir Chamado</title>
+  <!-- Ícone do aplicativo -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+  <link rel="alternate icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0c0816" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#07101e; --bg2:#0c1929; --surface:#0f2035; --surface2:#162840;
+      --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.1);
+      --text1:#e8f0fe; --text2:#7a93b0; --text3:#4a6282;
+      --indigo:#5b63f5; --indigo2:#7c83f7; --teal:#00d4aa; --amber:#f5a623;
+      --red:#f5476b; --green:#22d47a;
+      --sidebar-w:228px; --topbar-h:58px; --radius:14px; --radius-sm:9px;
+    }
+    html, body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text1); height:100vh; overflow:hidden; font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    button { cursor:pointer; font-family:inherit; }
+    ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:10px; }
+
+    .app { display:flex; height:100vh; overflow:hidden; }
+
+    /* Sidebar */
+    .sidebar { width:var(--sidebar-w); flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; height:100vh; transition:transform .25s ease; z-index:100; }
+    .sidebar-logo { display:flex; align-items:center; gap:10px; padding:1.2rem 1.4rem; border-bottom:1px solid var(--border); }
+    .logo-mark { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--indigo),#8b5cf6); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:900; font-size:.85rem; box-shadow:0 0 16px rgba(91,99,245,.4); }
+    .logo-i { color:#fff; } .logo-plus { color:#c4b5fd; }
+    .sidebar-brand { font-family:'Syne',sans-serif; font-weight:900; font-size:1.05rem; letter-spacing:.04em; }
+    .sidebar-brand .accent { color:var(--indigo2); }
+    .sidebar-nav { flex:1; padding:.75rem .7rem; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+    .nav-section { font-size:.6rem; font-weight:700; letter-spacing:.14em; color:var(--text3); padding:.7rem .7rem .2rem; text-transform:uppercase; }
+    .nav-item { display:flex; align-items:center; gap:10px; padding:.5rem .8rem; border-radius:var(--radius-sm); color:var(--text2); font-size:.83rem; font-weight:500; transition:all .15s; }
+    .nav-item:hover { background:var(--surface); color:var(--text1); }
+    .nav-item.active { background:rgba(91,99,245,.14); color:var(--indigo2); font-weight:600; }
+    .nav-item i { width:16px; text-align:center; font-size:.85rem; }
+    .sidebar-footer { padding:.9rem 1.2rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+    .s-avatar, .topbar-avatar { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--indigo),#8b5cf6); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:.7rem; flex-shrink:0; }
+    .s-user-name { font-size:.8rem; font-weight:600; } .s-user-role { font-size:.65rem; color:var(--indigo2); }
+    .s-online { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px rgba(34,212,122,.6); }
+
+    /* Main */
+    .main { flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
+    .topbar { height:var(--topbar-h); flex-shrink:0; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:1rem; padding:0 1.5rem; }
+    .topbar-title { flex:1; }
+    .topbar-title h1 { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:800; }
+    .topbar-title h1 span { color:var(--indigo2); }
+    .topbar-date { font-size:.7rem; color:var(--text3); display:block; }
+    .hamburger { display:none; background:none; border:none; color:var(--text2); font-size:1.05rem; padding:4px; }
+    .conn-chip { font-size:.68rem; font-weight:700; padding:3px 10px; border-radius:20px; display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border); background:var(--surface); color:var(--text2); }
+    .conn-chip .dot { width:7px; height:7px; border-radius:50%; background:var(--text3); }
+    .conn-chip.online  { color:var(--green); border-color:rgba(34,212,122,.25); } .conn-chip.online .dot { background:var(--green); }
+    .conn-chip.offline { color:var(--amber); border-color:rgba(245,166,35,.25); } .conn-chip.offline .dot { background:var(--amber); }
+
+    .scroll-area { flex:1; overflow-y:auto; padding:1.5rem; }
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:1.25rem; max-width:1200px; margin:0 auto; }
+
+    .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); }
+    .card-head { padding:1rem 1.25rem .8rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+    .card-head h3 { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:800; display:flex; align-items:center; gap:8px; }
+    .card-head h3 i { color:var(--indigo2); }
+    .card-body { padding:1.25rem; }
+
+    /* Form */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem 1rem; }
+    .full { grid-column:1 / -1; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-size:.75rem; font-weight:700; color:var(--text2); display:flex; align-items:center; gap:6px; }
+    .field label .req { color:var(--red); }
+    .field label .hint { margin-left:auto; font-weight:500; color:var(--text3); font-size:.7rem; }
+    .input, .select, .textarea {
+      width:100%; background:var(--bg2); border:1.5px solid var(--border2); border-radius:var(--radius-sm);
+      color:var(--text1); padding:.65rem .8rem; font-size:.85rem; font-family:inherit; outline:none;
+      transition:border-color .15s, box-shadow .15s;
+    }
+    .select { appearance:none; background-image:linear-gradient(45deg,transparent 50%,var(--text2) 50%),linear-gradient(135deg,var(--text2) 50%,transparent 50%); background-position:calc(100% - 16px) 55%,calc(100% - 11px) 55%; background-size:5px 5px; background-repeat:no-repeat; padding-right:2rem; }
+    .select option { background:var(--bg2); }
+    .textarea { min-height:140px; resize:vertical; line-height:1.55; }
+    .input::placeholder, .textarea::placeholder { color:var(--text3); }
+    .input:focus, .select:focus, .textarea:focus { border-color:var(--indigo); box-shadow:0 0 0 3px rgba(91,99,245,.15); }
+    .field.invalid .input, .field.invalid .select, .field.invalid .textarea { border-color:var(--red); }
+    .field-error { font-size:.72rem; color:#fda4af; display:none; }
+    .field.invalid .field-error { display:block; }
+
+    .printer-fields { display:none; }
+    .printer-fields.show { display:contents; }
+
+    /* Priority */
+    .prio-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .prio-opt { position:relative; }
+    .prio-opt input { position:absolute; opacity:0; pointer-events:none; }
+    .prio-opt label {
+      display:flex; flex-direction:column; gap:2px; padding:.6rem .7rem; border-radius:var(--radius-sm);
+      border:1.5px solid var(--border2); background:var(--bg2); cursor:pointer; transition:all .15s; color:var(--text1);
+    }
+    .prio-opt label strong { font-size:.8rem; display:flex; align-items:center; gap:6px; }
+    .prio-opt label span { font-size:.66rem; color:var(--text3); font-weight:500; }
+    .prio-opt label:hover { border-color:rgba(255,255,255,.2); }
+    .prio-opt input:focus-visible + label { box-shadow:0 0 0 3px rgba(91,99,245,.3); }
+    .prio-dot { width:8px; height:8px; border-radius:50%; }
+    .prio-opt input:checked + label { border-color:var(--c); background:color-mix(in srgb, var(--c) 12%, var(--bg2)); }
+
+    /* Dropzone */
+    .dropzone {
+      border:1.5px dashed rgba(255,255,255,.14); border-radius:var(--radius); padding:1.75rem 1rem;
+      text-align:center; cursor:pointer; transition:all .15s; background:rgba(255,255,255,.01);
+    }
+    .dropzone:hover, .dropzone.drag { border-color:var(--indigo); background:rgba(91,99,245,.06); }
+    .dropzone i { font-size:1.6rem; color:var(--text3); margin-bottom:.5rem; display:block; }
+    .dropzone.drag i { color:var(--indigo2); }
+    .dropzone p { color:var(--text2); font-size:.85rem; }
+    .dropzone small { color:var(--text3); font-size:.72rem; }
+    .file-list { display:flex; flex-direction:column; gap:6px; margin-top:.75rem; }
+    .file-item { display:flex; align-items:center; gap:10px; padding:.5rem .7rem; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); }
+    .file-thumb { width:36px; height:36px; border-radius:6px; background:var(--surface2); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; color:var(--red); }
+    .file-thumb img { width:100%; height:100%; object-fit:cover; }
+    .file-info { flex:1; min-width:0; }
+    .file-name { font-size:.8rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .file-size { font-size:.68rem; color:var(--text3); font-family:'JetBrains Mono',monospace; }
+    .file-remove { background:none; border:none; color:var(--text3); padding:6px; border-radius:6px; }
+    .file-remove:hover { color:var(--red); background:rgba(245,71,107,.1); }
+
+    /* Actions */
+    .form-actions { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-top:1.5rem; flex-wrap:wrap; }
+    .form-actions .left { font-size:.72rem; color:var(--text3); display:flex; align-items:center; gap:6px; }
+    .form-actions .right { display:flex; gap:.6rem; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:.7rem 1.2rem; border-radius:10px; font-size:.85rem; font-weight:700; border:1px solid transparent; transition:all .15s; }
+    .btn-ghost { background:transparent; border-color:var(--border2); color:var(--text2); }
+    .btn-ghost:hover { background:var(--surface2); color:var(--text1); }
+    .btn-primary { background:var(--indigo); color:#fff; box-shadow:0 4px 14px rgba(91,99,245,.35); min-width:170px; }
+    .btn-primary:hover:not(:disabled) { background:#4c54e8; transform:translateY(-1px); }
+    .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
+    .spinner { width:15px; height:15px; border-radius:50%; border:2px solid rgba(255,255,255,.3); border-top-color:#fff; animation:spin .65s linear infinite; display:none; }
+    .btn.loading .spinner { display:block; } .btn.loading .btn-icon { display:none; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    kbd { font-family:'JetBrains Mono',monospace; font-size:.65rem; padding:1px 5px; border-radius:4px; background:var(--surface2); border:1px solid var(--border2); }
+
+    /* Side panel */
+    .side { display:flex; flex-direction:column; gap:1rem; }
+    .sum-row { display:flex; justify-content:space-between; align-items:center; padding:.45rem 0; border-bottom:1px solid var(--border); font-size:.8rem; }
+    .sum-row:last-child { border:none; }
+    .sum-row span:first-child { color:var(--text3); }
+    .sum-row span:last-child { font-weight:600; text-align:right; }
+    .sla-box { margin-top:.75rem; padding:.75rem; border-radius:var(--radius-sm); background:var(--bg2); border:1px solid var(--border); }
+    .sla-box .t { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text3); margin-bottom:6px; }
+    .sla-line { display:flex; justify-content:space-between; font-size:.78rem; padding:2px 0; }
+    .sla-line b { font-family:'JetBrains Mono',monospace; font-weight:500; color:var(--teal); }
+    .kb-sug { display:flex; flex-direction:column; gap:6px; }
+    .kb-item { display:flex; gap:8px; align-items:flex-start; padding:.55rem .65rem; border-radius:var(--radius-sm); background:var(--bg2); border:1px solid var(--border); font-size:.78rem; transition:border-color .15s; }
+    .kb-item:hover { border-color:var(--indigo); }
+    .kb-item i { color:var(--indigo2); margin-top:3px; }
+    .kb-item small { display:block; color:var(--text3); font-size:.66rem; }
+    .muted { color:var(--text3); font-size:.78rem; }
+    .tips li { font-size:.78rem; color:var(--text2); margin:0 0 .45rem 1rem; }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+    .modal-overlay.hidden { display:none; }
+    .modal-box { background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); width:100%; max-width:440px; padding:2rem 1.75rem 1.5rem; text-align:center; box-shadow:0 24px 64px rgba(0,0,0,.6); animation:pop .25s ease; }
+    @keyframes pop { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:none; } }
+    .success-icon { width:64px; height:64px; border-radius:50%; margin:0 auto 1rem; display:flex; align-items:center; justify-content:center; font-size:1.7rem; background:rgba(34,212,122,.12); color:var(--green); box-shadow:0 0 0 8px rgba(34,212,122,.05); }
+    .success-icon.warn { background:rgba(245,166,35,.12); color:var(--amber); box-shadow:0 0 0 8px rgba(245,166,35,.05); }
+    .modal-box h2 { font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; margin-bottom:.3rem; }
+    .modal-box .tid { font-family:'JetBrains Mono',monospace; color:var(--indigo2); font-size:1.4rem; font-weight:500; margin:.5rem 0; }
+    .modal-box p { color:var(--text2); font-size:.82rem; margin-bottom:1rem; }
+    .modal-meta { text-align:left; background:var(--surface); border-radius:var(--radius-sm); padding:.5rem .9rem; margin-bottom:1.25rem; }
+    .modal-actions { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
+    .modal-actions .btn { min-width:0; width:100%; }
+    .modal-actions .btn-primary { grid-column:1 / -1; }
+    .offline-hint { margin:1rem 0 0; font-size:.74rem; color:var(--text3); line-height:1.5; }
+    .offline-hint b { color:var(--amber); font-weight:600; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:1.5rem; right:1.5rem; padding:.7rem 1rem; border-radius:var(--radius-sm); font-size:.8rem; font-weight:600; z-index:2000; animation:toast-in .3s ease; max-width:340px; }
+    .toast.hidden { display:none; }
+    .toast.success { background:#0f2a22; border:1px solid rgba(34,212,122,.3); color:#86efac; }
+    .toast.error   { background:#2a0f18; border:1px solid rgba(245,71,107,.3); color:#fda4af; }
+    @keyframes toast-in { from { opacity:0; transform:translateX(16px); } to { opacity:1; transform:none; } }
+
+    @media (max-width:1000px) { .layout { grid-template-columns:1fr; } }
+    @media (max-width:768px) {
+      .sidebar { position:fixed; top:0; left:0; transform:translateX(-100%); }
+      .sidebar.open { transform:none; }
+      .hamburger { display:flex; }
+      .scroll-area { padding:1rem; }
+      .form-grid { grid-template-columns:1fr; }
+      .prio-grid { grid-template-columns:1fr 1fr; }
+      .conn-chip { display:none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><span class="logo-i">i</span><span class="logo-plus">+</span></div>
+      <span class="sidebar-brand">INOVA<span class="accent">+</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="dashboard.html"  class="nav-item"><i class="fa fa-gauge-high"></i><span>Dashboard</span></a>
+      <a href="tickets.html"    class="nav-item"><i class="fa fa-ticket"></i><span>Todos os Tickets</span></a>
+      <a href="new-ticket.html" class="nav-item active"><i class="fa fa-plus-circle"></i><span>Abrir Chamado</span></a>
+      <a href="my-tickets.html" class="nav-item"><i class="fa fa-folder-open"></i><span>Meus Chamados</span></a>
+      <div class="nav-section">Gestão</div>
+      <a href="reports.html"    class="nav-item"><i class="fa fa-chart-bar"></i><span>Relatórios</span></a>
+      <a href="team.html"       class="nav-item"><i class="fa fa-users"></i><span>Equipe</span></a>
+      <a href="kb.html"         class="nav-item"><i class="fa fa-book"></i><span>Base de Conhecimento</span></a>
+      <a href="alerts.html"     class="nav-item"><i class="fa fa-bell"></i><span>Central de Alertas</span></a>
+      <a href="chat.html"       class="nav-item"><i class="fa fa-comments"></i><span>Conversas</span></a>
+      <div class="nav-section">Sistema</div>
+      <a href="#" class="nav-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i><span>Sair</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="s-avatar" id="sidebar-avatar">CG</div>
+      <div style="flex:1;min-width:0">
+        <div class="s-user-name" id="sidebar-name">Cauan Gomes</div>
+        <div class="s-user-role">Admin</div>
+      </div>
+      <div class="s-online"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu"><i class="fa fa-bars"></i></button>
+      <div class="topbar-title">
+        <h1>Abrir <span>Chamado</span></h1>
+        <span class="topbar-date" id="topbar-date"></span>
+      </div>
+      <span class="conn-chip" id="conn-chip" title="Status da conexão com o servidor"><span class="dot"></span><span id="conn-label">Verificando…</span></span>
+      <div class="topbar-avatar" id="topbar-avatar">CG</div>
+    </header>
+
+    <div class="scroll-area">
+      <div class="layout">
+
+        <!-- FORM -->
+        <form class="card" id="ticket-form" novalidate>
+          <div class="card-head"><h3><i class="fa fa-pen-to-square"></i> Dados do chamado</h3></div>
+          <div class="card-body">
+            <div class="form-grid">
+
+              <div class="field full" data-field="subject">
+                <label for="nt-subject">Assunto <span class="req">*</span><span class="hint" id="subject-count">0/120</span></label>
+                <input class="input" id="nt-subject" name="subject" maxlength="120" placeholder="Ex.: Impressora do financeiro atolando papel" autocomplete="off" />
+                <span class="field-error">Informe um assunto com pelo menos 5 caracteres.</span>
+              </div>
+
+              <div class="field" data-field="category">
+                <label for="nt-category">Categoria <span class="req">*</span></label>
+                <select class="select" id="nt-category" name="category">
+                  <option value="">Selecione…</option>
+                  <option value="Impressora">🖨️ Impressora</option>
+                  <option value="Suprimentos">🖋️ Suprimentos</option>
+                  <option value="TI">💻 TI</option>
+                  <option value="Rede">🌐 Rede</option>
+                  <option value="Outro">📋 Outro</option>
+                </select>
+                <span class="field-error">Selecione uma categoria.</span>
+              </div>
+
+              <div class="field" data-field="dept">
+                <label for="nt-dept">Departamento</label>
+                <select class="select" id="nt-dept" name="dept">
+                  <option>TI</option><option>Administrativo</option><option>Financeiro</option>
+                  <option>Operacional</option><option>Marketing</option><option>RH</option><option>Suporte</option>
+                </select>
+              </div>
+
+              <div class="printer-fields" id="printer-fields">
+                <div class="field" data-field="model">
+                  <label for="nt-printer-model">Modelo do equipamento</label>
+                  <input class="input" id="nt-printer-model" name="model" list="printer-models" placeholder="Ex.: Lexmark MX611" autocomplete="off" />
+                  <datalist id="printer-models">
+                    <option value="Lexmark MX611"><option value="Lexmark MX722adhe"><option value="Lexmark MS611de">
+                    <option value="Lexmark MX522"><option value="Epson L1250"><option value="HP LaserJet Pro M404">
+                  </datalist>
+                </div>
+                <div class="field" data-field="serial">
+                  <label for="nt-serial">Nº de série</label>
+                  <input class="input" id="nt-serial" name="serial" placeholder="Ex.: HP-3L8ZK1F9Q2" style="font-family:'JetBrains Mono',monospace;text-transform:uppercase" autocomplete="off" />
+                </div>
+              </div>
+
+              <div class="field full">
+                <label>Prioridade</label>
+                <div class="prio-grid" id="prio-grid">
+                  <div class="prio-opt" style="--c:#22d47a"><input type="radio" name="priority" id="p-baixa" value="Baixa"><label for="p-baixa"><strong><span class="prio-dot" style="background:#22d47a"></span>Baixa</strong><span>Resolução 72h</span></label></div>
+                  <div class="prio-opt" style="--c:#7c83f7"><input type="radio" name="priority" id="p-media" value="Média" checked><label for="p-media"><strong><span class="prio-dot" style="background:#7c83f7"></span>Média</strong><span>Resolução 24h</span></label></div>
+                  <div class="prio-opt" style="--c:#f5a623"><input type="radio" name="priority" id="p-alta" value="Alta"><label for="p-alta"><strong><span class="prio-dot" style="background:#f5a623"></span>Alta</strong><span>Resolução 8h</span></label></div>
+                  <div class="prio-opt" style="--c:#f5476b"><input type="radio" name="priority" id="p-critica" value="Crítica"><label for="p-critica"><strong><span class="prio-dot" style="background:#f5476b"></span>Crítica</strong><span>Resolução 4h</span></label></div>
+                </div>
+                <input type="hidden" id="nt-priority" value="Média" />
+              </div>
+
+              <div class="field" data-field="location">
+                <label for="nt-location">Local / Sala</label>
+                <input class="input" id="nt-location" name="location" placeholder="Ex.: 2º andar — Sala 204" autocomplete="off" />
+              </div>
+              <div class="field" data-field="contact">
+                <label for="nt-contact">Ramal / Contato</label>
+                <input class="input" id="nt-contact" name="contact" placeholder="Ex.: 2045 ou (11) 99999-0000" autocomplete="off" />
+              </div>
+
+              <div class="field full" data-field="desc">
+                <label for="nt-desc">Descrição <span class="req">*</span><span class="hint" id="desc-count">0/2000</span></label>
+                <textarea class="textarea" id="nt-desc" name="desc" maxlength="2000" placeholder="Descreva o problema: o que acontece, desde quando, mensagens de erro, o que já foi tentado…"></textarea>
+                <span class="field-error">Descreva o problema com pelo menos 10 caracteres.</span>
+              </div>
+
+              <div class="field full">
+                <label>Anexar arquivo <span class="hint" id="file-count"></span></label>
+                <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Anexar arquivos">
+                  <i class="fa fa-cloud-arrow-up"></i>
+                  <p>Clique para anexar ou arraste o arquivo aqui</p>
+                  <small>PNG, JPG, PDF até 10MB · máx. 5 arquivos · também aceita colar print (Ctrl+V)</small>
+                </div>
+                <input type="file" id="nt-files" accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf" multiple hidden />
+                <div class="file-list" id="file-list"></div>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <div class="left"><i class="fa fa-floppy-disk"></i> <span id="draft-status">Rascunho salvo automaticamente</span> · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> envia</div>
+              <div class="right">
+                <button type="button" class="btn btn-ghost" id="btn-cancel"><i class="fa fa-arrow-left"></i> Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btn-submit">
+                  <span class="spinner"></span><i class="fa fa-paper-plane btn-icon"></i> <span id="btn-submit-label">Abrir Chamado</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <!-- SIDE PANEL -->
+        <aside class="side">
+          <div class="card">
+            <div class="card-head"><h3><i class="fa fa-clipboard-list"></i> Resumo</h3></div>
+            <div class="card-body" style="padding-top:.6rem">
+              <div class="sum-row"><span>Solicitante</span><span id="sum-requester">—</span></div>
+              <div class="sum-row"><span>Categoria</span><span id="sum-category">—</span></div>
+              <div class="sum-row"><span>Prioridade</span><span id="sum-priority">Média</span></div>
+              <div class="sum-row"><span>Técnico sugerido</span><span id="sum-assignee" style="color:var(--indigo2)">—</span></div>
+              <div class="sla-box">
+                <div class="t">SLA previsto</div>
+                <div class="sla-line"><span>1ª resposta até</span><b id="sla-resp">—</b></div>
+                <div class="sla-line"><span>Resolução até</span><b id="sla-res">—</b></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3><i class="fa fa-lightbulb"></i> Artigos relacionados</h3></div>
+            <div class="card-body">
+              <div class="kb-sug" id="kb-suggestions"><p class="muted">Digite o assunto para ver soluções da Base de Conhecimento.</p></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3><i class="fa fa-circle-info"></i> Dicas</h3></div>
+            <div class="card-body">
+              <ul class="tips">
+                <li>Informe o <b>código de erro</b> exibido no equipamento.</li>
+                <li>Para impressoras, o <b>nº de série</b> fica na etiqueta traseira.</li>
+                <li>Anexe um <b>print ou foto</b> — agiliza o diagnóstico.</li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay hidden" id="modal-success" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="success-icon" id="success-icon"><i class="fa fa-check"></i></div>
+    <h2 id="success-title">Chamado aberto!</h2>
+    <div class="tid" id="success-id">#0000</div>
+    <p id="success-msg">O SLA já está correndo. Você será notificado a cada atualização.</p>
+    <div class="modal-meta">
+      <div class="sum-row"><span>Técnico</span><span id="success-assignee">—</span></div>
+      <div class="sum-row"><span>Prioridade</span><span id="success-priority">—</span></div>
+      <div class="sum-row"><span>Resolução até</span><span id="success-sla">—</span></div>
+    </div>
+    <div class="modal-actions">
+      <a class="btn btn-primary" id="success-link" href="tickets.html"><i class="fa fa-list"></i> Ver na lista</a>
+      <button class="btn btn-ghost" onclick="NewTicket.resetForm()"><i class="fa fa-plus"></i> Abrir outro</button>
+      <a class="btn btn-ghost" href="my-tickets.html"><i class="fa fa-folder-open"></i> Meus chamados</a>
+    </div>
+    <p class="offline-hint" id="offline-hint" hidden>
+      <i class="fa fa-circle-info"></i> Para enviar ao servidor, inicie o sistema pelo <b>iniciar-servidor.bat</b> (PHP) em vez do Live Server.
+    </p>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<div id="sidebar-overlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99" onclick="toggleSidebar()"></div>
+<style>#sidebar-overlay.hidden{display:none}</style>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="api.js"></script>
+<script src="new-ticket.js"></script>
+<script src="alerts.js"></script>
+<script src="notifications.js"></script>
+</body>
+</html>

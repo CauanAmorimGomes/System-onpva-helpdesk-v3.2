@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Helpdesk</title>
+  <!-- Ícone do aplicativo -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+  <link rel="alternate icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0c0816" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #080d18;
+      --card:       #0d1626;
+      --card-border: rgba(255,255,255,0.07);
+      --input-bg:   rgba(255,255,255,0.05);
+      --input-border: rgba(255,255,255,0.08);
+      --input-focus: #6366f1;
+      --text1:      #f1f5f9;
+      --text2:      #94a3b8;
+      --text3:      #475569;
+      --accent:     #6366f1;
+      --accent2:    #818cf8;
+      --success:    #22c55e;
+      --error:      #ef4444;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text1);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── BACKGROUND ORBS ─────────────────────────────────────────────── */
+    .login-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+    }
+
+    .orb1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(#6366f1, transparent 70%);
+      top: -160px; left: -140px;
+      animation: orb-drift 20s ease-in-out infinite alternate;
+    }
+    .orb2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(#8b5cf6, transparent 70%);
+      bottom: -120px; right: -120px;
+      animation: orb-drift 26s ease-in-out infinite alternate-reverse;
+    }
+    .orb3 {
+      width: 350px; height: 350px;
+      background: radial-gradient(#06b6d4, transparent 70%);
+      top: 45%; left: 58%;
+      animation: orb-drift 16s ease-in-out infinite alternate;
+    }
+
+    @keyframes orb-drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(25px, 18px) scale(1.05); }
+    }
+
+    /* ── LAYOUT ──────────────────────────────────────────────────────── */
+    .login-page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 400px;
+      animation: rise 0.5s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── CARD ────────────────────────────────────────────────────────── */
+    .login-card {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.25rem 2rem 1.75rem;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.03),
+        0 20px 60px rgba(0,0,0,0.5),
+        0 0 80px rgba(99,102,241,0.07);
+    }
+
+    /* ── LOGO ────────────────────────────────────────────────────────── */
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.75rem;
+    }
+
+    .logo-mark {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 24px rgba(99,102,241,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .logo-i    { color: #fff; }
+    .logo-plus { color: #c4b5fd; }
+
+    .login-logo .logo-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .logo-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+    }
+    .logo-name .accent { color: var(--accent2); }
+    .logo-sub {
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      color: var(--text3);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    /* ── TITLES ──────────────────────────────────────────────────────── */
+    .login-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .login-desc {
+      font-size: 0.82rem;
+      color: var(--text2);
+      margin-bottom: 1.5rem;
+      line-height: 1.55;
+    }
+
+    /* ── ALERT ───────────────────────────────────────────────────────── */
+    .alert-error {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.6rem 0.9rem;
+      border-radius: 10px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.22);
+      color: #fca5a5;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 1.1rem;
+      animation: shake 0.38s ease;
+    }
+    .alert-error.hidden { display: none; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%,75%  { transform: translateX(-5px); }
+      50%      { transform: translateX(5px); }
+    }
+
+    /* ── FORM GROUPS ─────────────────────────────────────────────────── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      font-size: 0.73rem;
+      font-weight: 700;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-wrap > i {
+      position: absolute;
+      left: 13px;
+      color: var(--text3);
+      font-size: 0.82rem;
+      pointer-events: none;
+      transition: color 0.18s;
+    }
+    .input-wrap input {
+      width: 100%;
+      padding: 0.72rem 2.5rem 0.72rem 2.4rem;
+      background: var(--input-bg);
+      border: 1.5px solid var(--input-border);
+      border-radius: 10px;
+      color: var(--text1);
+      font-size: 0.86rem;
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.18s, background 0.18s, box-shadow 0.18s;
+    }
+    .input-wrap input::placeholder { color: var(--text3); }
+    .input-wrap input:focus {
+      border-color: var(--input-focus);
+      background: rgba(99,102,241,0.07);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.13);
+    }
+    .input-wrap:focus-within > i { color: var(--accent2); }
+
+    .toggle-pass {
+      position: absolute;
+      right: 11px;
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 0.82rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.15s;
+      line-height: 1;
+    }
+    .toggle-pass:hover { color: var(--text2); }
+
+    /* ── OPTIONS ROW ─────────────────────────────────────────────────── */
+    .login-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.35rem;
+      font-size: 0.78rem;
+    }
+    .checkbox-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--text2);
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      width: 15px; height: 15px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .forgot-link {
+      color: var(--accent2);
+      text-decoration: none;
+      font-weight: 600;
+      opacity: 0.85;
+      transition: opacity 0.15s;
+    }
+    .forgot-link:hover { opacity: 1; }
+
+    /* ── BUTTON ──────────────────────────────────────────────────────── */
+    .btn-login {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.88rem;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+      transition: transform 0.14s, box-shadow 0.14s, opacity 0.14s;
+      margin-bottom: 1rem;
+    }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(99,102,241,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .btn-login:active:not(:disabled) { transform: scale(0.98); }
+    .btn-login:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    /* Spinner inside button */
+    .btn-spinner {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      animation: spin 0.65s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-login.loading .btn-spinner { display: block; }
+    .btn-login.loading .btn-label   { display: none; }
+
+    /* ── FOOTER TEXT ─────────────────────────────────────────────────── */
+    .login-footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--text3);
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--card-border);
+    }
+
+    /* ── INFO BADGES ─────────────────────────────────────────────────── */
+    .login-info {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .info-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: rgba(99,102,241,0.08);
+      border: 1px solid rgba(99,102,241,0.18);
+      border-radius: 20px;
+      font-size: 0.72rem;
+      color: var(--accent2);
+      font-weight: 600;
+    }
+    .info-badge i { font-size: 0.68rem; opacity: 0.8; }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+    @media (max-width: 440px) {
+      .login-card { padding: 1.75rem 1.5rem 1.5rem; border-radius: 16px; }
+      .login-info { gap: 6px; }
+      .info-badge { font-size: 0.68rem; padding: 4px 10px; }
+    }
+    @media (max-width: 360px) {
+      .login-card { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-bg">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="login-page">
+  <div class="login-container">
+
+    <div class="login-card">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="logo-mark">
+          <span class="logo-i">i</span><span class="logo-plus">+</span>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">INOVA<span class="accent">+</span></span>
+          <span class="logo-sub">Helpdesk System</span>
+        </div>
+      </div>
+
+      <h2 class="login-title">Bem-vindo de volta</h2>
+      <p class="login-desc">Entre com suas credenciais para acessar o sistema</p>
+
+      <!-- Alert -->
+      <div id="login-error" class="alert-error hidden">
+        <i class="fa fa-exclamation-circle"></i>
+        <span id="login-error-msg"></span>
+      </div>
+
+      <!-- E-mail -->
+      <div class="form-group">
+        <label for="login-email">E-mail</label>
+        <div class="input-wrap">
+          <i class="fa fa-envelope"></i>
+          <input
+            type="email"
+            id="login-email"
+            placeholder="seu@email.com"
+            autocomplete="username"
+            value="cauan.gomes@techub.com"
+            onkeydown="if(event.key==='Enter') doLogin()"
+          />
+        </div>
+      </div>
+
+      <!-- Senha -->
+      <div class="form-group">
+        <label for="login-pass">Senha</label>
+        <div class="input-wrap">
+          <i class="fa fa-lock"></i>
+          <input
+            type="password"
+            id="login-pass"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            value="mudar@1254"
+            onkeydown="if(event.key==='Enter') doLogin()"
+          />
+          <button class="toggle-pass" type="button" onclick="togglePass()">
+            <i class="fa fa-eye" id="eye-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Options -->
+      <div class="login-options">
+        <label class="checkbox-wrap">
+          <input type="checkbox" id="remember-me" />
+          <span>Lembrar de mim</span>
+        </label>
+        <a href="#" class="forgot-link">Esqueci a senha</a>
+      </div>
+
+      <!-- Button -->
+      <button class="btn-login" id="btn-login" onclick="doLogin()">
+        <div class="btn-spinner"></div>
+        <span class="btn-label">
+          Entrar no Sistema &nbsp;<i class="fa fa-arrow-right"></i>
+        </span>
+      </button>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        absprinter © 2025 — Powered by Inova+
+      </div>
+
+    </div>
+
+    <!-- Info badges -->
+    <div class="login-info">
+      <div class="info-badge"><i class="fa fa-shield-halved"></i> JWT Seguro</div>
+      <div class="info-badge"><i class="fa fa-bell"></i> SLA Automático</div>
+      <div class="info-badge"><i class="fa fa-robot"></i> IA Integrada</div>
+    </div>
+
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+  function togglePass() {
+    const inp  = document.getElementById('login-pass');
+    const icon = document.getElementById('eye-icon');
+    const isPass = inp.type === 'password';
+    inp.type       = isPass ? 'text' : 'password';
+    icon.className = isPass ? 'fa fa-eye-slash' : 'fa fa-eye';
+  }
+
+  function showError(msg) {
+    const el  = document.getElementById('login-error');
+    const msg_ = document.getElementById('login-error-msg');
+    msg_.textContent = msg;
+    el.classList.remove('hidden');
+    // Re-trigger shake
+    void el.offsetWidth;
+    el.className = 'alert-error';
+  }
+
+  function hideError() {
+    document.getElementById('login-error').classList.add('hidden');
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('btn-login');
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+  }
+
+  async function doLogin() {
+    hideError();
+    const email  = document.getElementById('login-email').value.trim();
+    const pass   = document.getElementById('login-pass').value;
+    const remember = document.getElementById('remember-me').checked;
+
+    if (!email || !pass) { showError('Preencha e-mail e senha.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('E-mail inválido.'); return; }
+
+    setLoading(true);
+
+    let result;
+    try {
+      result = await Auth.loginWithAPI(email, pass);
+    } catch {
+      result = Auth.localLogin(email, pass);
+    }
+
+    await new Promise(r => setTimeout(r, 450));
+
+    if (result.success) {
+      Auth.saveSession(result.user, result.token, result.refreshToken, remember);
+      window.location.href = 'dashboard.html';
+    } else {
+      setLoading(false);
+      showError(result.error || 'E-mail ou senha incorretos. Verifique suas credenciais.');
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
+    }
+  }
+</script>
+</body>
+</html>

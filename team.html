@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Equipe</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="app-page">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-mark sm"><span class="logo-i">i</span><span class="logo-plus">+</span></div><span class="sidebar-brand">INOVA<span class="accent">+</span></span></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">PRINCIPAL</div>
+    <a href="dashboard.html" class="nav-item"><i class="fa fa-gauge-high"></i><span>Dashboard</span></a>
+    <a href="tickets.html" class="nav-item"><i class="fa fa-ticket"></i><span>Todos os Tickets</span></a>
+    <a href="new-ticket.html" class="nav-item"><i class="fa fa-plus-circle"></i><span>Abrir Chamado</span></a>
+    <a href="my-tickets.html" class="nav-item"><i class="fa fa-folder-open"></i><span>Meus Chamados</span></a>
+    <div class="nav-section-label">GESTÃO</div>
+    <a href="reports.html" class="nav-item"><i class="fa fa-chart-bar"></i><span>Relatórios</span></a>
+    <a href="team.html" class="nav-item active"><i class="fa fa-users"></i><span>Equipe</span></a>
+    <a href="kb.html" class="nav-item"><i class="fa fa-book"></i><span>Base de Conhecimento</span></a>
+    <a href="alerts.html" class="nav-item"><i class="fa fa-bell"></i><span>Central de Alertas</span></a>
+    <a href="chat.html" class="nav-item"><i class="fa fa-comments"></i><span>Conversas</span></a>
+    <div class="nav-section-label">SISTEMA</div>
+    <a href="#" class="nav-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i><span>Sair</span></a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-avatar">CG</div>
+    <div class="user-info"><span class="user-name" id="sidebar-name">Cauan Gomes</span><span class="user-role admin-badge">Admin</span></div>
+    <div class="online-dot"></div>
+  </div>
+</aside>
+<main class="main-content">
+  <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+    <div class="topbar-title"><h1>Gestão de <span class="accent">Equipe</span></h1></div>
+    <div class="topbar-actions"><div class="user-avatar sm">CG</div></div>
+  </header>
+
+  <div class="team-stats-grid">
+    <div class="kpi-card kpi-open"><div class="kpi-icon"><i class="fa fa-circle" style="color:#22c55e;font-size:12px"></i></div><div class="kpi-info"><span class="kpi-label">Online agora</span><span class="kpi-value">6</span></div></div>
+    <div class="kpi-card kpi-resolved"><div class="kpi-icon"><i class="fa fa-headset"></i></div><div class="kpi-info"><span class="kpi-label">Em atendimento</span><span class="kpi-value">4</span></div></div>
+    <div class="kpi-card kpi-avg"><div class="kpi-icon"><i class="fa fa-trophy" style="color:#f59e0b"></i></div><div class="kpi-info"><span class="kpi-label">Top atendente</span><span class="kpi-value" style="font-size:1rem">Ana Lima</span></div></div>
+  </div>
+
+  <div class="team-full-grid">
+    <div class="panel">
+      <div class="panel-header"><h3><i class="fa fa-trophy accent"></i> Ranking de Produtividade</h3><span class="chip">Este mês</span></div>
+      <div class="ranking-list">
+        <div class="ranking-item rank1">
+          <span class="rank-pos">🥇</span>
+          <div class="team-member-info">
+            <div class="user-avatar sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">AL</div>
+            <div><strong>Ana Lima</strong><small>Suporte Sênior</small></div>
+          </div>
+          <div class="rank-stats"><span class="rank-tickets">42 tickets</span><span class="sla-badge ok">SLA 95%</span></div>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:100%"></div></div>
+        </div>
+        <div class="ranking-item rank2">
+          <span class="rank-pos">🥈</span>
+          <div class="team-member-info">
+            <div class="user-avatar sm" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CG</div>
+            <div><strong>Cauan Gomes</strong><small>Administrador</small></div>
+          </div>
+          <div class="rank-stats"><span class="rank-tickets">38 tickets</span><span class="sla-badge ok">SLA 91%</span></div>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:90%"></div></div>
+        </div>
+        <div class="ranking-item">
+          <span class="rank-pos">🥉</span>
+          <div class="team-member-info">
+            <div class="user-avatar sm" style="background:linear-gradient(135deg,#10b981,#06b6d4)">RS</div>
+            <div><strong>Ricardo Silva</strong><small>Técnico TI</small></div>
+          </div>
+          <div class="rank-stats"><span class="rank-tickets">31 tickets</span><span class="sla-badge warn">SLA 84%</span></div>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:74%"></div></div>
+        </div>
+        <div class="ranking-item">
+          <span class="rank-pos">4º</span>
+          <div class="team-member-info">
+            <div class="user-avatar sm" style="background:linear-gradient(135deg,#ec4899,#f43f5e)">MO</div>
+            <div><strong>Mariana Oliveira</strong><small>Suporte</small></div>
+          </div>
+          <div class="rank-stats"><span class="rank-tickets">27 tickets</span><span class="sla-badge ok">SLA 88%</span></div>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:64%"></div></div>
+        </div>
+        <div class="ranking-item">
+          <span class="rank-pos">5º</span>
+          <div class="team-member-info">
+            <div class="user-avatar sm" style="background:linear-gradient(135deg,#f59e0b,#84cc16)">PF</div>
+            <div><strong>Paulo Ferreira</strong><small>Técnico</small></div>
+          </div>
+          <div class="rank-stats"><span class="rank-tickets">19 tickets</span><span class="sla-badge critical">SLA 71%</span></div>
+          <div class="rank-bar-wrap"><div class="rank-bar" style="width:45%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><h3>Status da Equipe — Agora</h3></div>
+      <div class="team-live-list">
+        <div class="team-live-item"><div class="online-dot"></div><div class="user-avatar sm" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">AL</div><div class="tlive-info"><strong>Ana Lima</strong><small>Atendendo ticket #0042</small></div><span class="sla-badge ok">Online</span></div>
+        <div class="team-live-item"><div class="online-dot"></div><div class="user-avatar sm" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CG</div><div class="tlive-info"><strong>Cauan Gomes</strong><small>Admin — Dashboard</small></div><span class="sla-badge ok">Online</span></div>
+        <div class="team-live-item"><div class="online-dot"></div><div class="user-avatar sm" style="background:linear-gradient(135deg,#10b981,#06b6d4)">RS</div><div class="tlive-info"><strong>Ricardo Silva</strong><small>Atendendo ticket #0039</small></div><span class="sla-badge ok">Online</span></div>
+        <div class="team-live-item"><div class="online-dot"></div><div class="user-avatar sm" style="background:linear-gradient(135deg,#ec4899,#f43f5e)">MO</div><div class="tlive-info"><strong>Mariana Oliveira</strong><small>Atendendo ticket #0041</small></div><span class="sla-badge ok">Online</span></div>
+        <div class="team-live-item"><div class="online-dot" style="background:#64748b"></div><div class="user-avatar sm" style="background:linear-gradient(135deg,#475569,#334155)">JC</div><div class="tlive-info"><strong>João Costa</strong><small>Almoço</small></div><span class="sla-badge" style="background:#334155;color:#94a3b8">Ausente</span></div>
+        <div class="team-live-item"><div class="online-dot" style="background:#64748b"></div><div class="user-avatar sm" style="background:linear-gradient(135deg,#f59e0b,#84cc16)">PF</div><div class="tlive-info"><strong>Paulo Ferreira</strong><small>Offline</small></div><span class="sla-badge" style="background:#1e293b;color:#64748b">Offline</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:1.5rem">
+    <div class="panel-header"><h3>Performance por Atendente</h3><span class="chip">Mês atual</span></div>
+    <canvas id="chart-team-perf" height="70"></canvas>
+  </div>
+<div class="toast hidden" id="toast"></div>
+</main>
+<script src="auth.js"></script>
+<script>
+  window.onload = () => {
+    checkAuth();
+    new Chart(document.getElementById('chart-team-perf'), {
+      type: 'bar',
+      data: {
+        labels: ['Ana Lima','Cauan Gomes','Ricardo Silva','Mariana Oliveira','Paulo Ferreira'],
+        datasets: [
+          { label: 'Resolvidos', data: [42,38,31,27,19], backgroundColor: 'rgba(99,102,241,0.8)', borderRadius: 6 },
+          { label: 'SLA %', data: [95,91,84,88,71], backgroundColor: 'rgba(251,113,133,0.6)', borderRadius: 6, yAxisID: 'y2' }
+        ]
+      },
+      options: { responsive: true, plugins: { legend: { labels: { color: '#cbd5e1' } } }, scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y2: { position: 'right', ticks: { color: '#94a3b8', callback: v => v+'%' }, grid: { display: false }, min: 0, max: 100 } } }
+    });
+  };
+</script>
+<!-- Sidebar overlay for mobile -->
+<div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="toggleSidebar()"></div>
+</body>
+</html>

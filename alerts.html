@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Central de Alertas</title>
+  <!-- Ícone do aplicativo -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+  <link rel="alternate icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0c0816" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="alerts.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="app-page">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark sm"><span class="logo-i">i</span><span class="logo-plus">+</span></div>
+    <span class="sidebar-brand">INOVA<span class="accent">+</span></span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">PRINCIPAL</div>
+    <a href="dashboard.html" class="nav-item"><i class="fa fa-gauge-high"></i><span>Dashboard</span></a>
+    <a href="tickets.html" class="nav-item"><i class="fa fa-ticket"></i><span>Todos os Tickets</span></a>
+    <a href="new-ticket.html" class="nav-item"><i class="fa fa-plus-circle"></i><span>Abrir Chamado</span></a>
+    <a href="my-tickets.html" class="nav-item"><i class="fa fa-folder-open"></i><span>Meus Chamados</span></a>
+    <div class="nav-section-label">GESTÃO</div>
+    <a href="reports.html" class="nav-item"><i class="fa fa-chart-bar"></i><span>Relatórios</span></a>
+    <a href="team.html" class="nav-item"><i class="fa fa-users"></i><span>Equipe</span></a>
+    <a href="kb.html" class="nav-item"><i class="fa fa-book"></i><span>Base de Conhecimento</span></a>
+    <a href="alerts.html" class="nav-item active"><i class="fa fa-bell"></i><span>Central de Alertas</span></a>
+    <a href="chat.html" class="nav-item"><i class="fa fa-comments"></i><span>Conversas</span></a>
+    <div class="nav-section-label">SISTEMA</div>
+    <a href="#" class="nav-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i><span>Sair</span></a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-avatar">CG</div>
+    <div class="user-info">
+      <span class="user-name" id="sidebar-name">Cauan Gomes</span>
+      <span class="user-role admin-badge">Admin</span>
+    </div>
+    <div class="online-dot"></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main-content">
+  <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+    <div class="topbar-title">
+      <h1>Central de <span class="accent">Alertas</span></h1>
+      <span class="topbar-date" id="topbar-date"></span>
+    </div>
+    <div class="topbar-actions">
+      <!-- Badge dinâmico -->
+      <div class="sla-alert-badge" id="sla-risk-badge" style="display:none"></div>
+      <div class="notif-btn" onclick="toggleNotif()">
+        <i class="fa fa-bell"></i>
+        <span class="notif-count" id="notif-count-badge">0</span>
+        <div class="notif-panel hidden" id="notif-panel"></div>
+      </div>
+      <div class="user-avatar sm" id="topbar-avatar">CG</div>
+    </div>
+  </header>
+
+  <!-- HERO METRICS -->
+  <section class="alert-hero">
+    <div class="alert-hero-card critico" id="hero-critico">
+      <div class="alert-hero-icon"><i class="fa fa-fire"></i></div>
+      <div class="alert-hero-info">
+        <span class="alert-hero-num" id="hero-num-critico">0</span>
+        <span class="alert-hero-label">Críticos</span>
+        <span class="alert-hero-sub">Ação imediata necessária</span>
+      </div>
+    </div>
+    <div class="alert-hero-card atencao" id="hero-atencao">
+      <div class="alert-hero-icon"><i class="fa fa-triangle-exclamation"></i></div>
+      <div class="alert-hero-info">
+        <span class="alert-hero-num" id="hero-num-atencao">0</span>
+        <span class="alert-hero-label">Em Atenção</span>
+        <span class="alert-hero-sub">Monitorar de perto</span>
+      </div>
+    </div>
+    <div class="alert-hero-card total">
+      <div class="alert-hero-icon"><i class="fa fa-bell"></i></div>
+      <div class="alert-hero-info">
+        <span class="alert-hero-num" id="hero-num-total">0</span>
+        <span class="alert-hero-label">Total de Alertas</span>
+        <span class="alert-hero-sub">Ativos agora</span>
+      </div>
+    </div>
+    <div class="alert-hero-card sla-ok">
+      <div class="alert-hero-icon"><i class="fa fa-circle-check"></i></div>
+      <div class="alert-hero-info">
+        <span class="alert-hero-num" id="hero-num-ok">0</span>
+        <span class="alert-hero-label">Dentro do SLA</span>
+        <span class="alert-hero-sub">Sem alertas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- REFRESH BAR -->
+  <div class="alert-refresh-bar">
+    <span id="refresh-ts" style="font-size:0.78rem;color:var(--text3)">
+      <i class="fa fa-rotate" id="refresh-spin"></i> Atualizado agora
+    </span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span style="font-size:0.75rem;color:var(--text3)">Auto-refresh em</span>
+      <span class="chip" id="refresh-countdown">60s</span>
+      <button class="btn-outline sm" onclick="manualRefresh()"><i class="fa fa-rotate-right"></i> Atualizar</button>
+    </div>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="alert-filter-tabs">
+    <button class="tab-btn active" onclick="setAlertTab('all',this)">
+      <i class="fa fa-list"></i> Todos <span class="tab-count" id="atab-all">0</span>
+    </button>
+    <button class="tab-btn" onclick="setAlertTab('critico',this)">
+      <i class="fa fa-fire"></i> Críticos <span class="tab-count" id="atab-critico">0</span>
+    </button>
+    <button class="tab-btn" onclick="setAlertTab('atencao',this)">
+      <i class="fa fa-triangle-exclamation"></i> Atenção <span class="tab-count" id="atab-atencao">0</span>
+    </button>
+    <button class="tab-btn" onclick="setAlertTab('novo_chamado',this)">
+      <i class="fa fa-inbox"></i> Novos na fila <span class="tab-count" id="atab-novo">0</span>
+    </button>
+    <button class="tab-btn" onclick="setAlertTab('sla_vencido',this)">
+      <i class="fa fa-clock"></i> SLA Vencido
+    </button>
+    <button class="tab-btn" onclick="setAlertTab('impressora_serial',this)">
+      <i class="fa fa-print"></i> Impressoras
+    </button>
+  </div>
+
+  <!-- ALERT PANEL -->
+  <div class="alert-panel-wrap">
+    <div id="alerts-container"></div>
+  </div>
+
+  <!-- TICKET DETAIL MODAL -->
+  <div class="modal-overlay hidden" id="modal-detail">
+    <div class="modal-box large">
+      <div class="modal-header">
+        <h2 id="modal-title">Ticket</h2>
+        <button class="modal-close" onclick="closeModal('modal-detail')"><i class="fa fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="modal-body-detail"></div>
+      <div class="modal-footer" id="modal-footer-detail"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast hidden" id="toast"></div>
+</main>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="api.js"></script>
+<script src="alerts.js"></script>
+<script src="notifications.js"></script>
+<script>
+  let currentAlertTab = 'all';
+  let refreshSeconds  = 60;
+  let refreshTimer;
+
+  window.onload = () => {
+    checkAuth();
+    fullRender();
+    startCountdown();
+  };
+
+  function fullRender() {
+    const all    = AlertSystem.getAll();
+    const counts = AlertSystem.counts();
+    const active = TICKETS.filter(t => t.status === 'Aberto' || t.status === 'Em andamento');
+    const ok     = active.filter(t => t.sla > 50).length;
+
+    // Hero nums
+    animNum('hero-num-critico', counts.critico);
+    animNum('hero-num-atencao', counts.atencao);
+    animNum('hero-num-total',   counts.total);
+    animNum('hero-num-ok',      ok);
+
+    // Pulse hero crítico
+    const heroC = document.getElementById('hero-critico');
+    if (counts.critico > 0) heroC.classList.add('pulsing'); else heroC.classList.remove('pulsing');
+
+    // Tab counts
+    document.getElementById('atab-all').textContent     = all.length;
+    document.getElementById('atab-critico').textContent  = counts.critico;
+    document.getElementById('atab-atencao').textContent  = counts.atencao;
+    document.getElementById('atab-novo').textContent     = all.filter(a => a.type === 'novo_chamado').length;
+
+    // Render filtered alerts
+    renderFilteredAlerts();
+    updateTopbarAlerts();
+
+    // Refresh timestamp
+    const now = new Date();
+    document.getElementById('refresh-ts').innerHTML =
+      `<i class="fa fa-rotate"></i> Atualizado às ${now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  }
+
+  function renderFilteredAlerts() {
+    const all = AlertSystem.getAll();
+    let filtered = all;
+    if (currentAlertTab !== 'all') {
+      filtered = all.filter(a => a.level === currentAlertTab || a.type === currentAlertTab);
+    }
+    const container = document.getElementById('alerts-container');
+    if (!filtered.length) {
+      container.innerHTML = `
+        <div class="alert-empty" style="margin:2rem">
+          <i class="fa fa-circle-check" style="color:var(--success);font-size:2.5rem;margin-bottom:0.75rem;display:block"></i>
+          <strong>Nenhum alerta nessa categoria</strong>
+          <span>Todos os chamados estão dentro do critério selecionado ✅</span>
+        </div>`;
+      return;
+    }
+    container.innerHTML = filtered.map(a => renderAlertCard(a)).join('');
+  }
+
+  function setAlertTab(tab, btn) {
+    document.querySelectorAll('.alert-filter-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentAlertTab = tab;
+    renderFilteredAlerts();
+  }
+
+  function animNum(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let n = 0;
+    const step = Math.ceil(target / 20) || 1;
+    clearInterval(el._timer);
+    el._timer = setInterval(() => {
+      n = Math.min(n + step, target);
+      el.textContent = n;
+      if (n >= target) clearInterval(el._timer);
+    }, 40);
+  }
+
+  function manualRefresh() {
+    const icon = document.getElementById('refresh-spin');
+    icon.classList.add('fa-spin');
+    setTimeout(() => icon.classList.remove('fa-spin'), 800);
+    fullRender();
+    refreshSeconds = 60;
+  }
+
+  function startCountdown() {
+    clearInterval(refreshTimer);
+    refreshSeconds = 60;
+    refreshTimer = setInterval(() => {
+      refreshSeconds--;
+      const el = document.getElementById('refresh-countdown');
+      if (el) el.textContent = refreshSeconds + 's';
+      if (refreshSeconds <= 0) {
+        fullRender();
+        refreshSeconds = 60;
+      }
+    }, 1000);
+  }
+</script>
+<!-- Sidebar overlay for mobile -->
+<div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="toggleSidebar()"></div>
+</body>
+</html>

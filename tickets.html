@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Todos os Tickets</title>
+  <!-- Ícone do aplicativo -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+  <link rel="alternate icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0c0816" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --bg:#07101e; --bg2:#0c1929; --surface:#0f2035; --surface2:#162840;
+      --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.1);
+      --text1:#e8f0fe; --text2:#7a93b0; --text3:#4a6282;
+      --indigo:#5b63f5; --indigo2:#7c83f7; --accent2:#7c83f7; --teal:#00d4aa; --amber:#f5a623;
+      --red:#f5476b; --green:#22d47a;
+      --sidebar-w:228px; --topbar-h:58px; --radius:14px; --radius-sm:9px;
+    }
+    html, body { font-family:'DM Sans',system-ui,sans-serif; background:var(--bg); color:var(--text1); height:100vh; overflow:hidden; font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; text-decoration:none; }
+    button { cursor:pointer; font-family:inherit; }
+    ::-webkit-scrollbar { width:6px; height:6px; } ::-webkit-scrollbar-thumb { background:var(--surface2); border-radius:10px; }
+
+    .app { display:flex; height:100vh; overflow:hidden; }
+
+    /* Sidebar */
+    .sidebar { width:var(--sidebar-w); flex-shrink:0; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; height:100vh; transition:transform .25s ease; z-index:100; }
+    .sidebar-logo { display:flex; align-items:center; gap:10px; padding:1.2rem 1.4rem; border-bottom:1px solid var(--border); }
+    .logo-mark { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--indigo),#8b5cf6); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:900; font-size:.85rem; box-shadow:0 0 16px rgba(91,99,245,.4); }
+    .logo-i { color:#fff; } .logo-plus { color:#c4b5fd; }
+    .sidebar-brand { font-family:'Syne',sans-serif; font-weight:900; font-size:1.05rem; letter-spacing:.04em; }
+    .sidebar-brand .accent { color:var(--indigo2); }
+    .sidebar-nav { flex:1; padding:.75rem .7rem; overflow-y:auto; display:flex; flex-direction:column; gap:2px; }
+    .nav-section { font-size:.6rem; font-weight:700; letter-spacing:.14em; color:var(--text3); padding:.7rem .7rem .2rem; text-transform:uppercase; }
+    .nav-item { display:flex; align-items:center; gap:10px; padding:.5rem .8rem; border-radius:var(--radius-sm); color:var(--text2); font-size:.83rem; font-weight:500; transition:all .15s; }
+    .nav-item:hover { background:var(--surface); color:var(--text1); }
+    .nav-item.active { background:rgba(91,99,245,.14); color:var(--indigo2); font-weight:600; }
+    .nav-item i { width:16px; text-align:center; font-size:.85rem; }
+    .nav-badge { margin-left:auto; font-size:.62rem; font-weight:700; background:rgba(245,71,107,.2); color:#fda4af; padding:1px 6px; border-radius:20px; }
+    .sidebar-footer { padding:.9rem 1.2rem; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+    .s-avatar, .topbar-avatar { width:32px; height:32px; border-radius:9px; background:linear-gradient(135deg,var(--indigo),#8b5cf6); display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:800; font-size:.7rem; flex-shrink:0; }
+    .s-user-name { font-size:.8rem; font-weight:600; } .s-user-role { font-size:.65rem; color:var(--indigo2); }
+    .s-online { width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px rgba(34,212,122,.6); }
+
+    /* Main */
+    .main { flex:1; display:flex; flex-direction:column; height:100vh; min-width:0; }
+    .topbar { height:var(--topbar-h); flex-shrink:0; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:1rem; padding:0 1.5rem; }
+    .topbar-title { flex:1; }
+    .topbar-title h1 { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:800; }
+    .topbar-title h1 span { color:var(--indigo2); }
+    .topbar-date { font-size:.7rem; color:var(--text3); display:block; }
+    .hamburger { display:none; background:none; border:none; color:var(--text2); font-size:1.05rem; padding:4px; }
+    .scroll-area { flex:1; overflow-y:auto; padding:1.25rem 1.5rem 2rem; }
+
+    /* Buttons */
+    .btn { display:inline-flex; align-items:center; gap:7px; padding:.55rem 1rem; border-radius:var(--radius-sm); font-size:.8rem; font-weight:700; border:1px solid transparent; transition:all .15s; white-space:nowrap; }
+    .btn-primary { background:var(--indigo); color:#fff; box-shadow:0 4px 12px rgba(91,99,245,.3); }
+    .btn-primary:hover { background:#4c54e8; }
+    .btn-ghost { background:transparent; border-color:var(--border2); color:var(--text2); }
+    .btn-ghost:hover { background:var(--surface2); color:var(--text1); }
+    .btn-primary.sm, .btn-outline, .btn-success, .btn-danger { display:inline-flex; align-items:center; gap:6px; padding:.45rem .85rem; border-radius:var(--radius-sm); font-size:.78rem; font-weight:600; border:1px solid transparent; }
+    .btn-outline { background:transparent; border-color:var(--border2); color:var(--text2); }
+    .btn-success { background:rgba(34,212,122,.12); color:#86efac; border-color:rgba(34,212,122,.2); }
+    .btn-danger  { background:rgba(245,71,107,.1); color:#fda4af; border-color:rgba(245,71,107,.2); }
+
+    /* Filters */
+    .filters { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .search { flex:1; min-width:240px; position:relative; }
+    .search i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text3); font-size:.8rem; }
+    .search input, .filters select { width:100%; background:var(--bg2); border:1.5px solid var(--border2); border-radius:var(--radius-sm); color:var(--text1); padding:.6rem .8rem; font-size:.82rem; font-family:inherit; outline:none; }
+    .search input { padding-left:2.2rem; }
+    .search input:focus, .filters select:focus { border-color:var(--indigo); }
+    .filters select { width:auto; min-width:160px; cursor:pointer; }
+    .filters select option { background:var(--bg2); }
+
+    .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:1rem; align-items:center; }
+    .tab { background:var(--surface); border:1px solid var(--border2); color:var(--text2); padding:.4rem .9rem; border-radius:20px; font-size:.78rem; font-weight:600; display:flex; align-items:center; gap:7px; transition:all .15s; }
+    .tab:hover { color:var(--text1); }
+    .tab.active { background:rgba(91,99,245,.15); border-color:rgba(91,99,245,.4); color:var(--indigo2); }
+    .tab .count { font-size:.66rem; padding:0 7px; border-radius:10px; background:rgba(255,255,255,.07); }
+    .refresh-info { margin-left:auto; font-size:.72rem; color:var(--text3); display:flex; align-items:center; gap:6px; }
+    .refresh-info button { background:none; border:none; color:var(--text2); padding:4px; }
+    .refresh-info button:hover { color:var(--text1); }
+
+    /* Table */
+    .table-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:1080px; }
+    th { text-align:left; font-size:.66rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--text3); padding:.8rem 1rem; border-bottom:1px solid var(--border); background:var(--bg2); position:sticky; top:0; }
+    td { padding:.8rem 1rem; border-bottom:1px solid var(--border); font-size:.82rem; vertical-align:middle; }
+    tbody tr { transition:background .12s; cursor:pointer; }
+    tbody tr:hover { background:rgba(255,255,255,.02); }
+    tbody tr:last-child td { border-bottom:none; }
+    tr.is-new { background:rgba(91,99,245,.07); }
+    tr.flash { animation:flash 2.2s ease; }
+    @keyframes flash { 0%,40% { background:rgba(91,99,245,.28); } 100% { background:rgba(91,99,245,.07); } }
+    .t-id { font-family:'JetBrains Mono',monospace; color:var(--indigo2); font-weight:600; white-space:nowrap; }
+    .t-subj { max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+    .t-sub { font-size:.68rem; color:var(--text3); font-family:'JetBrains Mono',monospace; display:flex; gap:6px; align-items:center; margin-top:2px; }
+    .chip-new { font-size:.58rem; font-weight:800; letter-spacing:.06em; padding:1px 6px; border-radius:4px; background:rgba(91,99,245,.2); color:#a5b4fc; font-family:'DM Sans',sans-serif; }
+    .chip-off { font-size:.58rem; font-weight:800; padding:1px 6px; border-radius:4px; background:rgba(245,166,35,.15); color:#fcd34d; font-family:'DM Sans',sans-serif; }
+    .muted { color:var(--text2); }
+    .assignee { color:var(--indigo2); }
+    .date { color:var(--text3); font-size:.75rem; white-space:nowrap; }
+    .actions-cell { display:flex; gap:4px; }
+    .action-btn { width:28px; height:28px; border-radius:7px; border:1px solid var(--border2); background:transparent; color:var(--text2); display:flex; align-items:center; justify-content:center; font-size:.75rem; }
+    .action-btn:hover { background:var(--surface2); color:var(--text1); }
+    .action-btn.close:hover { color:var(--green); border-color:rgba(34,212,122,.3); }
+
+    /* Badges (usados pelo data.js) */
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:6px; font-size:.7rem; font-weight:700; white-space:nowrap; border:1px solid transparent; }
+    .badge-critica  { background:rgba(245,71,107,.15); color:#fda4af; border-color:rgba(245,71,107,.3); }
+    .badge-alta     { background:rgba(245,166,35,.12); color:#fcd34d; border-color:rgba(245,166,35,.3); }
+    .badge-media    { background:rgba(91,99,245,.12); color:#a5b4fc; border-color:rgba(91,99,245,.3); }
+    .badge-baixa    { background:rgba(34,212,122,.1); color:#86efac; border-color:rgba(34,212,122,.25); }
+    .badge-aberto   { background:rgba(91,99,245,.1); color:#a5b4fc; border-color:rgba(91,99,245,.3); }
+    .badge-andamento{ background:rgba(245,166,35,.1); color:#fcd34d; border-color:rgba(245,166,35,.3); }
+    .badge-resolvido{ background:rgba(34,212,122,.1); color:#86efac; border-color:rgba(34,212,122,.25); }
+    .badge-fechado  { background:rgba(100,116,139,.1); color:#94a3b8; border-color:rgba(100,116,139,.3); }
+    .sla-bar-wrap { display:flex; align-items:center; gap:8px; min-width:110px; }
+    .sla-bar { flex:1; height:5px; background:var(--surface2); border-radius:10px; overflow:hidden; }
+    .sla-fill { height:100%; border-radius:10px; }
+
+    .empty { padding:3rem 1rem; text-align:center; color:var(--text3); }
+    .empty i { font-size:2rem; display:block; margin-bottom:.75rem; }
+    .table-foot { padding:.7rem 1rem; font-size:.72rem; color:var(--text3); border-top:1px solid var(--border); display:flex; justify-content:space-between; }
+
+    /* Modal (openTicketDetail do data.js) */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+    .modal-overlay.hidden { display:none; }
+    .modal-box { background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); width:100%; max-width:640px; max-height:86vh; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,.6); }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.25rem .75rem; border-bottom:1px solid var(--border); }
+    .modal-header h2 { font-family:'Syne',sans-serif; font-size:.95rem; font-weight:800; }
+    .modal-close { width:28px; height:28px; border-radius:7px; background:var(--surface); border:1px solid var(--border); color:var(--text3); flex-shrink:0; }
+    .modal-body { flex:1; overflow-y:auto; padding:1.25rem; }
+    .modal-footer { display:flex; gap:.6rem; justify-content:flex-end; padding:.75rem 1.25rem; border-top:1px solid var(--border); }
+    .ticket-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-bottom:1rem; }
+    .detail-item { display:flex; flex-direction:column; gap:3px; }
+    .detail-item label { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--text3); }
+    .detail-item span { font-size:.82rem; }
+    .ticket-desc-box { background:var(--bg); border-radius:var(--radius-sm); padding:.8rem 1rem; font-size:.82rem; color:var(--text2); line-height:1.6; margin-bottom:1rem; white-space:pre-wrap; }
+    .chat-msg { display:flex; gap:9px; margin-bottom:.65rem; }
+    .chat-avatar { width:26px; height:26px; border-radius:7px; background:linear-gradient(135deg,var(--indigo),#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:800; flex-shrink:0; }
+    .chat-bubble { background:var(--surface); border-radius:0 8px 8px 8px; padding:.45rem .75rem; font-size:.8rem; color:var(--text2); flex:1; }
+    .chat-author { font-weight:700; color:var(--text1); font-size:.72rem; margin-bottom:2px; }
+    .chat-reply { display:flex; gap:8px; margin-top:.75rem; }
+    .chat-reply input { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text1); padding:.5rem .75rem; font-size:.8rem; outline:none; font-family:inherit; }
+    .chat-reply input:focus { border-color:var(--indigo); }
+
+    .toast { position:fixed; bottom:1.5rem; right:1.5rem; padding:.7rem 1rem; border-radius:var(--radius-sm); font-size:.8rem; font-weight:600; z-index:2000; max-width:340px; }
+    .toast.hidden { display:none; }
+    .toast.success { background:#0f2a22; border:1px solid rgba(34,212,122,.3); color:#86efac; }
+    .toast.error   { background:#2a0f18; border:1px solid rgba(245,71,107,.3); color:#fda4af; }
+
+    @media (max-width:768px) {
+      .sidebar { position:fixed; top:0; left:0; transform:translateX(-100%); }
+      .sidebar.open { transform:none; }
+      .hamburger { display:flex; }
+      .scroll-area { padding:1rem; }
+      .filters select { flex:1; min-width:140px; }
+      .refresh-info { margin-left:0; width:100%; }
+      .ticket-detail-grid { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark"><span class="logo-i">i</span><span class="logo-plus">+</span></div>
+      <span class="sidebar-brand">INOVA<span class="accent">+</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="dashboard.html"  class="nav-item"><i class="fa fa-gauge-high"></i><span>Dashboard</span></a>
+      <a href="tickets.html"    class="nav-item active"><i class="fa fa-ticket"></i><span>Todos os Tickets</span><span class="nav-badge" id="nav-open-count">0</span></a>
+      <a href="new-ticket.html" class="nav-item"><i class="fa fa-plus-circle"></i><span>Abrir Chamado</span></a>
+      <a href="my-tickets.html" class="nav-item"><i class="fa fa-folder-open"></i><span>Meus Chamados</span></a>
+      <div class="nav-section">Gestão</div>
+      <a href="reports.html"    class="nav-item"><i class="fa fa-chart-bar"></i><span>Relatórios</span></a>
+      <a href="team.html"       class="nav-item"><i class="fa fa-users"></i><span>Equipe</span></a>
+      <a href="kb.html"         class="nav-item"><i class="fa fa-book"></i><span>Base de Conhecimento</span></a>
+      <a href="alerts.html"     class="nav-item"><i class="fa fa-bell"></i><span>Central de Alertas</span></a>
+      <a href="chat.html"       class="nav-item"><i class="fa fa-comments"></i><span>Conversas</span></a>
+      <div class="nav-section">Sistema</div>
+      <a href="#" class="nav-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i><span>Sair</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="s-avatar" id="sidebar-avatar">CG</div>
+      <div style="flex:1;min-width:0">
+        <div class="s-user-name" id="sidebar-name">Cauan Gomes</div>
+        <div class="s-user-role">Admin</div>
+      </div>
+      <div class="s-online"></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()" aria-label="Menu"><i class="fa fa-bars"></i></button>
+      <div class="topbar-title">
+        <h1>Todos os <span>Tickets</span></h1>
+        <span class="topbar-date" id="topbar-date"></span>
+      </div>
+      <a href="new-ticket.html" class="btn btn-primary"><i class="fa fa-plus"></i> Novo Chamado</a>
+      <div class="topbar-avatar" id="topbar-avatar">CG</div>
+    </header>
+
+    <div class="scroll-area">
+      <div class="filters">
+        <div class="search">
+          <i class="fa fa-search"></i>
+          <input type="text" id="f-search" placeholder="Buscar por assunto, ID, usuário, nº de série…" />
+        </div>
+        <select id="f-status">
+          <option value="">Todos os status</option>
+          <option>Aberto</option><option>Em andamento</option><option>Resolvido</option><option>Fechado</option>
+        </select>
+        <select id="f-priority">
+          <option value="">Todas as prioridades</option>
+          <option>Crítica</option><option>Alta</option><option>Média</option><option>Baixa</option>
+        </select>
+        <select id="f-category">
+          <option value="">Todas as categorias</option>
+          <option>Impressora</option><option>Suprimentos</option><option>TI</option><option>Rede</option><option>Outro</option>
+        </select>
+        <button class="btn btn-ghost" id="f-clear"><i class="fa fa-xmark"></i> Limpar</button>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <button class="tab active" data-tab="">Todos <span class="count" id="c-all">0</span></button>
+        <button class="tab" data-tab="Aberto">Abertos <span class="count" id="c-aberto">0</span></button>
+        <button class="tab" data-tab="Em andamento">Em Andamento <span class="count" id="c-andamento">0</span></button>
+        <button class="tab" data-tab="Resolvido">Resolvidos <span class="count" id="c-resolvido">0</span></button>
+        <button class="tab" data-tab="Fechado">Fechados <span class="count" id="c-fechado">0</span></button>
+        <div class="refresh-info">
+          <span id="refresh-label">Carregando…</span>
+          <button onclick="refreshTickets(true)" title="Atualizar agora"><i class="fa fa-rotate-right" id="refresh-icon"></i></button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Assunto</th><th>Categoria</th><th>Solicitante</th><th>Atribuído</th>
+                <th>Prioridade</th><th>Status</th><th>SLA</th><th>Criado</th><th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-body"></tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span id="foot-count">—</span><span>Clique em uma linha para ver os detalhes</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de detalhes (preenchido por openTicketDetail em data.js) -->
+<div class="modal-overlay hidden" id="modal-detail">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modal-title">Ticket</h2>
+      <button class="modal-close" onclick="closeModal('modal-detail')"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modal-body-detail"></div>
+    <div class="modal-footer" id="modal-footer-detail"></div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<div id="sidebar-overlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99" onclick="toggleSidebar()"></div>
+<style>#sidebar-overlay.hidden{display:none}</style>
+
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="api.js"></script>
+<script src="alerts.js"></script>
+<script src="notifications.js"></script>
+<script>
+  'use strict';
+
+  const filters = { search:'', status:'', priority:'', category:'' };
+  const PRIORITY_ORDER = { 'Crítica':0, 'Alta':1, 'Média':2, 'Baixa':3 };
+  let lastSync = null;
+
+  // ID do chamado recém-criado (?novo=0043) para destacar
+  const params = new URLSearchParams(location.search);
+  const highlightId = params.get('novo') ? '#' + params.get('novo').replace(/\D/g,'').padStart(4,'0') : null;
+
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const idNum = t => parseInt(String(t.id).replace(/\D/g,''), 10) || 0;
+
+  function isNew(t) {
+    const d = new Date(t.created_at || t.created);
+    return !isNaN(d) && (Date.now() - d.getTime()) < 24 * 3600 * 1000;
+  }
+
+  function fmtDate(t) {
+    const d = new Date(t.created_at || (t.created + 'T12:00:00'));
+    if (isNaN(d)) return esc(t.created || '—');
+    return t.created_at
+      ? d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+      : d.toLocaleDateString('pt-BR');
+  }
+
+  function list() { return Array.isArray(window.TICKETS) ? window.TICKETS : []; }
+
+  // Chamado pela api.js depois que os dados do servidor chegam
+  function renderTickets() {
+    const all = list();
+
+    // Contadores das abas
+    const cnt = s => all.filter(t => t.status === s).length;
+    document.getElementById('c-all').textContent       = all.length;
+    document.getElementById('c-aberto').textContent    = cnt('Aberto');
+    document.getElementById('c-andamento').textContent = cnt('Em andamento');
+    document.getElementById('c-resolvido').textContent = cnt('Resolvido');
+    document.getElementById('c-fechado').textContent   = cnt('Fechado');
+    const open = cnt('Aberto') + cnt('Em andamento');
+    const nb = document.getElementById('nav-open-count');
+    nb.textContent = open; nb.style.display = open ? '' : 'none';
+
+    // Filtros
+    const q = filters.search.toLowerCase();
+    const rows = all.filter(t =>
+      (!filters.status   || t.status   === filters.status) &&
+      (!filters.priority || t.priority === filters.priority) &&
+      (!filters.category || t.category === filters.category) &&
+      (!q || [t.id, t.subject, t.requester, t.assignee, t.serial, t.model, t.category]
+              .some(v => String(v || '').toLowerCase().includes(q)))
+    )
+    // Mais novos primeiro (ID decrescente)
+    .sort((a, b) => idNum(b) - idNum(a));
+
+    const body = document.getElementById('tickets-body');
+    if (!rows.length) {
+      body.innerHTML = `<tr><td colspan="10"><div class="empty"><i class="fa fa-inbox"></i>Nenhum chamado encontrado com esses filtros.</div></td></tr>`;
+    } else {
+      body.innerHTML = rows.map(t => {
+        const cls = [isNew(t) ? 'is-new' : '', t.id === highlightId ? 'flash' : ''].join(' ');
+        return `
+        <tr class="${cls}" data-id="${esc(t.id)}">
+          <td class="t-id">${esc(t.id)}</td>
+          <td>
+            <div class="t-subj" title="${esc(t.subject)}">${esc(t.subject)}</div>
+            <div class="t-sub">
+              ${isNew(t) ? '<span class="chip-new">NOVO</span>' : ''}
+              ${t._pending ? '<span class="chip-off" title="Criado sem servidor — será sincronizado">OFFLINE</span>' : ''}
+              ${(t.attachments || []).length ? `<span title="Anexos"><i class="fa fa-paperclip"></i> ${t.attachments.length}</span>` : ''}
+              ${t.serial ? esc(t.serial) : ''}
+            </div>
+          </td>
+          <td class="muted">${esc(t.category)}</td>
+          <td class="muted">${esc(t.requester)}</td>
+          <td class="assignee">${esc(t.assignee || '—')}</td>
+          <td>${priorityBadge(t.priority)}</td>
+          <td>${statusBadge(t.status)}</td>
+          <td>${slaBar(t.sla)}</td>
+          <td class="date">${fmtDate(t)}</td>
+          <td>
+            <div class="actions-cell">
+              <button class="action-btn view" data-action="view" title="Ver detalhes"><i class="fa fa-eye"></i></button>
+              ${t.status !== 'Fechado' ? `<button class="action-btn close" data-action="close" title="Fechar ticket"><i class="fa fa-check"></i></button>` : ''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    document.getElementById('foot-count').textContent =
+      `Mostrando ${rows.length} de ${all.length} chamado${all.length !== 1 ? 's' : ''}`;
+
+    // Rola até o chamado recém-criado
+    if (highlightId && !renderTickets._scrolled) {
+      const row = body.querySelector(`tr[data-id="${CSS.escape(highlightId)}"]`);
+      if (row) {
+        row.scrollIntoView({ block:'center' });
+        renderTickets._scrolled = true;
+        if (params.get('abrir')) setTimeout(() => openTicketDetail(highlightId), 300);
+      }
+    }
+  }
+  window.renderTickets = renderTickets;
+
+  async function refreshTickets(manual) {
+    const icon = document.getElementById('refresh-icon');
+    icon.classList.add('fa-spin');
+    try {
+      await TicketAPI.syncPending();
+      await TicketAPI.list();
+      lastSync = new Date();
+      document.getElementById('refresh-label').textContent =
+        'Atualizado às ' + lastSync.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    } catch {
+      // Servidor offline: recarrega apenas os chamados locais
+      const local = LocalTickets.all();
+      const ids = new Set(list().map(t => t.id));
+      window.TICKETS.unshift(...local.filter(t => !ids.has(t.id)));
+      document.getElementById('refresh-label').textContent = 'Modo offline — dados locais';
+      if (manual) showToast('Servidor indisponível. Mostrando dados locais.', 'error');
+    } finally {
+      renderTickets();
+      setTimeout(() => icon.classList.remove('fa-spin'), 400);
+    }
+  }
+  window.refreshTickets = refreshTickets;
+
+  // ── Eventos ────────────────────────────────────────────────────────────────
+  document.getElementById('f-search').addEventListener('input', e => { filters.search = e.target.value.trim(); renderTickets(); });
+  ['status','priority','category'].forEach(k =>
+    document.getElementById('f-' + k).addEventListener('change', e => {
+      filters[k] = e.target.value;
+      if (k === 'status') syncTabs();
+      renderTickets();
+    }));
+
+  document.getElementById('f-clear').addEventListener('click', () => {
+    Object.keys(filters).forEach(k => filters[k] = '');
+    ['search','status','priority','category'].forEach(k => document.getElementById('f-' + k).value = '');
+    syncTabs(); renderTickets();
+  });
+
+  document.getElementById('tabs').addEventListener('click', e => {
+    const tab = e.target.closest('.tab');
+    if (!tab) return;
+    filters.status = tab.dataset.tab;
+    document.getElementById('f-status').value = filters.status;
+    syncTabs(); renderTickets();
+  });
+
+  function syncTabs() {
+    document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === filters.status));
+  }
+
+  document.getElementById('tickets-body').addEventListener('click', e => {
+    const row = e.target.closest('tr[data-id]');
+    if (!row) return;
+    const id = row.dataset.id;
+    const action = e.target.closest('[data-action]')?.dataset.action;
+    if (action === 'close') {
+      if (confirm(`Fechar o chamado ${id}?`)) closeTicketById(id);
+      return;
+    }
+    openTicketDetail(id);
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal('modal-detail'); });
+
+  // Chamado criado em outra aba → atualiza esta
+  window.addEventListener('storage', e => { if (e.key === 'inova_local_tickets') refreshTickets(); });
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  window.addEventListener('load', () => {
+    checkAuth();
+    renderTickets();                          // mostra na hora o que já tem (mock + locais)
+    refreshTickets();                         // depois busca do servidor
+    setInterval(() => refreshTickets(), 30_000);
+  });
+</script>
+</body>
+</html>

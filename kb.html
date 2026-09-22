@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inova+ | Base de Conhecimento</title>
+  <!-- Ícone do aplicativo -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icons/icon-32.png" sizes="32x32" type="image/png" />
+  <link rel="alternate icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0c0816" />
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body class="app-page">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo"><div class="logo-mark sm"><span class="logo-i">i</span><span class="logo-plus">+</span></div><span class="sidebar-brand">INOVA<span class="accent">+</span></span></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">PRINCIPAL</div>
+    <a href="dashboard.html" class="nav-item"><i class="fa fa-gauge-high"></i><span>Dashboard</span></a>
+    <a href="tickets.html" class="nav-item"><i class="fa fa-ticket"></i><span>Todos os Tickets</span></a>
+    <a href="new-ticket.html" class="nav-item"><i class="fa fa-plus-circle"></i><span>Abrir Chamado</span></a>
+    <a href="my-tickets.html" class="nav-item"><i class="fa fa-folder-open"></i><span>Meus Chamados</span></a>
+    <div class="nav-section-label">GESTÃO</div>
+    <a href="reports.html" class="nav-item"><i class="fa fa-chart-bar"></i><span>Relatórios</span></a>
+    <a href="team.html" class="nav-item"><i class="fa fa-users"></i><span>Equipe</span></a>
+    <a href="kb.html" class="nav-item active"><i class="fa fa-book"></i><span>Base de Conhecimento</span></a>
+    <a href="alerts.html" class="nav-item"><i class="fa fa-bell"></i><span>Central de Alertas</span></a>
+    <a href="chat.html" class="nav-item"><i class="fa fa-comments"></i><span>Conversas</span></a>
+    <div class="nav-section-label">SISTEMA</div>
+    <a href="#" class="nav-item" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i><span>Sair</span></a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebar-avatar">CG</div>
+    <div class="user-info"><span class="user-name" id="sidebar-name">Cauan Gomes</span><span class="user-role admin-badge">Admin</span></div>
+    <div class="online-dot"></div>
+  </div>
+</aside>
+<main class="main-content">
+  <header class="topbar">
+    <button class="hamburger" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+    <div class="topbar-title"><h1>Base de <span class="accent">Conhecimento</span></h1></div>
+    <div class="topbar-actions"><div class="user-avatar sm">CG</div></div>
+  </header>
+
+  <div class="kb-hero">
+    <div class="kb-search-big">
+      <i class="fa fa-search"></i>
+      <input type="text" id="kb-search" placeholder="Buscar artigos, procedimentos, soluções..." oninput="searchKB()" />
+    </div>
+    <div class="kb-stats">
+      <span><i class="fa fa-file-lines accent"></i> 48 Artigos</span>
+      <span><i class="fa fa-tag accent"></i> 6 Categorias</span>
+      <span><i class="fa fa-eye accent"></i> 1.2k Visualizações</span>
+    </div>
+  </div>
+
+  <div class="kb-categories">
+    <button class="kb-cat-btn active" onclick="filterKB('',this)">Todos</button>
+    <button class="kb-cat-btn" onclick="filterKB('Impressora',this)">🖨️ Impressoras</button>
+    <button class="kb-cat-btn" onclick="filterKB('Suprimentos',this)">🖋️ Suprimentos</button>
+    <button class="kb-cat-btn" onclick="filterKB('TI',this)">💻 TI</button>
+    <button class="kb-cat-btn" onclick="filterKB('Rede',this)">🌐 Rede</button>
+    <button class="kb-cat-btn" onclick="filterKB('Outro',this)">📋 Geral</button>
+  </div>
+
+  <div class="kb-articles" id="kb-articles"></div>
+
+  <!-- Article Modal -->
+  <div class="modal-overlay hidden" id="kb-modal">
+    <div class="modal-box large">
+      <div class="modal-header">
+        <h2 id="kb-modal-title"></h2>
+        <button class="modal-close" onclick="closeModal('kb-modal')"><i class="fa fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" id="kb-modal-body"></div>
+    </div>
+  </div>
+<div class="toast hidden" id="toast"></div>
+</main>
+<script src="auth.js"></script>
+<script src="data.js"></script>
+<script src="api.js"></script>
+<script>
+  const KB_ARTICLES = [
+    { id:1, title:"Como limpar papel atolado na MX611", cat:"Impressora", views:234, tags:["atolamento","MX611"], body:"<p>1. Desligue a impressora e aguarde 5 minutos.</p><p>2. Abra a tampa traseira e remova o papel com cuidado.</p><p>3. Verifique se não há fragmentos de papel.</p><p>4. Reative e teste uma impressão.</p><p><strong>Dica:</strong> Use papel recomendado (75g/m²) para evitar atolamentos.</p>" },
+    { id:2, title:"Troca de toner — Lexmark MX611", cat:"Impressora", views:189, tags:["toner","substituição","MX611"], body:"<p>1. Acesse o menu <strong>Configurações &gt; Manutenção</strong>.</p><p>2. Aguarde a mensagem de liberação do toner.</p><p>3. Abra a tampa frontal, gire e puxe o cartucho antigo.</p><p>4. Agite o novo cartucho 5x antes de inserir.</p><p>5. Encaixe e feche a tampa.</p>" },
+    { id:3, title:"Impressora offline — diagnóstico rápido", cat:"Impressora", views:312, tags:["offline","rede","diagnóstico"], body:"<p>1. Verifique o cabo USB ou conexão Wi-Fi.</p><p>2. Reinicie o spooler: <code>services.msc &gt; Print Spooler &gt; Reiniciar</code>.</p><p>3. Desinstale e reinstale o driver.</p><p>4. Verifique firewall bloqueando porta 9100.</p>" },
+    { id:4, title:"Configurar impressora em rede Windows 10/11", cat:"Rede", views:156, tags:["rede","driver","windows"], body:"<p>1. Acesse <strong>Painel de Controle &gt; Dispositivos e Impressoras</strong>.</p><p>2. Clique em 'Adicionar impressora'.</p><p>3. Selecione 'Adicionar impressora de rede'.</p><p>4. Insira o IP da impressora (ex: 192.168.1.50).</p>" },
+    { id:5, title:"Epson L1250 — recarregar tinta EcoTank", cat:"Suprimentos", views:98, tags:["tinta","epson","ecotank"], body:"<p>1. Nunca deixe o nível abaixo do mínimo.</p><p>2. Use apenas tinta Epson original.</p><p>3. Abra o tampo do reservatório e alinhe o bico.</p><p>4. Preencha devagar sem ultrapassar a linha MAX.</p>" },
+    { id:6, title:"Reset de contador de páginas Lexmark", cat:"Impressora", views:77, tags:["reset","manutenção"], body:"<p>1. Acesse o menu de administração (PIN: 1234).</p><p>2. Vá em Configurações &gt; Geral &gt; Contadores.</p><p>3. Selecione o contador desejado e pressione Reset.</p>" },
+    { id:7, title:"VPN corporativa — configuração", cat:"TI", views:203, tags:["vpn","rede","segurança"], body:"<p>1. Baixe o cliente OpenVPN no portal TI.</p><p>2. Importe o arquivo .ovpn fornecido pelo admin.</p><p>3. Use as credenciais corporativas para conectar.</p>" },
+    { id:8, title:"Solicitação de suprimentos — procedimento", cat:"Suprimentos", views:145, tags:["suprimentos","toner","pedido"], body:"<p>1. Abra um chamado com categoria 'Suprimentos'.</p><p>2. Informe o modelo da impressora e serial.</p><p>3. SLA: entrega em até 2 dias úteis.</p>" },
+  ];
+  let kbFilter = '', kbSearch = '';
+  function searchKB() { kbSearch = document.getElementById('kb-search').value.toLowerCase(); renderKB(); }
+  function filterKB(cat, btn) {
+    document.querySelectorAll('.kb-cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    kbFilter = cat; renderKB();
+  }
+  function renderKB() {
+    const arts = KB_ARTICLES.filter(a =>
+      (!kbFilter || a.cat === kbFilter) &&
+      (!kbSearch || a.title.toLowerCase().includes(kbSearch) || a.tags.some(t => t.includes(kbSearch)))
+    );
+    const el = document.getElementById('kb-articles');
+    el.innerHTML = arts.length ? arts.map(a => `
+      <div class="kb-card" onclick="openArticle(${a.id})">
+        <div class="kb-card-cat">${a.cat}</div>
+        <h3>${a.title}</h3>
+        <div class="kb-card-meta"><i class="fa fa-eye"></i> ${a.views} <span>${a.tags.map(t=>'<span class=kb-tag>'+t+'</span>').join('')}</span></div>
+      </div>`).join('') : '<div class="empty-state" style="text-align:center;padding:3rem;color:#64748b"><i class="fa fa-search" style="font-size:2rem;margin-bottom:1rem;display:block"></i>Nenhum artigo encontrado</div>';
+  }
+  function openArticle(id) {
+    const a = KB_ARTICLES.find(x => x.id === id);
+    document.getElementById('kb-modal-title').textContent = a.title;
+    document.getElementById('kb-modal-body').innerHTML = `<div class="kb-full-article">${a.body}</div>`;
+    document.getElementById('kb-modal').classList.remove('hidden');
+  }
+  window.onload = () => { checkAuth(); renderKB(); };
+</script>
+<!-- Sidebar overlay for mobile -->
+<div id="sidebar-overlay" class="sidebar-overlay hidden" onclick="toggleSidebar()"></div>
+<script src="notifications.js"></script>
+</body>
+</html>
